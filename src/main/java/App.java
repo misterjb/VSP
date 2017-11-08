@@ -36,5 +36,16 @@ public class App {
 			model.put("helloContent", test);			
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));		
 		});
+		post("/index", (request, response) -> {
+			//curl -d '{"name":"jannikb", "password":"jannikb"}' -H "Content-Type: application/json" -X POST 172.19.0.3:5000/users
+			//curl --user jannikb:jannikb 172.19.0.3:5000/login
+			//curl 172.19.0.3:5000/whoami -H "Accept: application/json" -H 'Authorization: Token <tokenvalue>'
+			//request.queryParams("txt_username");
+			//request.queryParams("txt_password");
+			Map model = new HashMap<>();
+			test = request.queryParams("Quest");
+			model.put("helloContent", test);			
+			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));		
+		});
 	}
 }
