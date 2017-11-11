@@ -1,0 +1,12 @@
+DetailsDeliverable DeliverablesID=id "/blackboard/deliverables/{id}" Details about a single deliverable
+DeliveriesList "/blackboard/deliveries" Lists the deliveries
+DetailsDelivery DeliveryID=id"/blackboard/deliveries/{id}" Details about a single delivery
+QuestsList "/blackboard/quests" Lists the quests available
+detailsQuest detailsQuestID=id "/blackboard/quests/{id}" Shows details about the quest
+QuestTaskList tasklistQuestID=id "/blackboard/quests/{id}/tasks" Lists the tasks to be fulfilled to solve the quest
+TaskDetails detailsTaskID=id"/blackboard/tasks/{id} " Details about a single task
+Map "/map" Your friendly map, telling you where locations are found
+MapInfo MapName=name "/map/{name}" Information about a location on the map
+UserList "/users" The list of users
+UserDetails UserName=name "/users/{name}" Shows details about a single user
+gotoLocation LocationName=name Visit Location host/visits

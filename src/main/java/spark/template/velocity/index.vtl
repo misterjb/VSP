@@ -4,79 +4,91 @@
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 <title>Blackboard RPG TEH GAME</title>
 <style type="text/css">
-        textarea
-        {
+	textarea{
         font-family:Montserrat;  
         font-size: 12px;   
-        resize: none;
-        }
+        resize: none;}
+	fieldset{
+    	border: 0;}	
  	.auto-style1 {
-	font-family: Montserrat;	
-	}
+		font-family: Montserrat;}
 </style>
 </head>
 <body>
 <span class="auto-style1">
-<form method="post"> 
-	<span class="auto-style1">	
-	<h3>Kreuzen Sie die gewünschten Quest an:</h3>
-</span>		 
-  <fieldset>
+<div style="width: 700px; height: 500px">
+<form method="post" style="width: 700px; height: 500px;"> 
+	<h3>Kreuzen Sie die gewünschten Befehl an:</h3>
+	<fieldset style="width: 571px">
     <ul>
-      <li> 
+      <li style="height: 35px">         
+      <label>
+          <input type="radio" name="Quest" value="QuestsList" checked="checked"/> 
+		Lists the quests available</label></li>
+      <li style="height: 35px">  
         <label>
-          <input type="radio" name="Quest" value="Quest 1"/>
-          Quest 1  
+           <input type="radio" name="Quest" value="DetailsDeliverable"/>
+           Details about a single deliverable
+       </label>
+        <input name="DeliverablesID" type="text" /></li>
+      <li style="height: 35px">  
+        <label>
+          <input type="radio" name="Quest" value="DeliveriesList"/>
+          Lists the deliveries</label></li>
+      <li style="height: 35px">  
+        <label>
+          <input type="radio" name="Quest" value="DetailsDelivery"/>
+         Details about a single delivery <input name="DeliveryID" type="text" />
+        </label></li>
+	  <li style="height: 35px">  
+        <label>
+          <input type="radio" name="Quest" value="detailsQuest"/>
+          Shows details about the quest <input name="detailsQuestID" type="text" />
         </label>
       </li>
-      <li> 
+      <li style="height: 35px; width: 630px;">  
         <label>
-           <input type="radio" name="Quest" value="Quest 2"/>
-           Quest 2
+          <input type="radio" name="Quest" value="QuestTaskList"/>
+          Lists the tasks to be fulfilled to solve the quest <input name="tasklistQuestID" type="text" />
         </label>
       </li>
-      <li>  
+      <li style="height: 35px">  
         <label>
-          <input type="radio" name="Quest" value="Quest 4"/>
-          Quest 4
+          <input type="radio" name="Quest" value="TaskDetails"/>
+          Details about a single task <input name="detailsTaskID" type="text" />
         </label>
       </li>
-      <li>  
+     <li style="height: 35px"> 
         <label>
-          <input type="radio" name="Quest" value="Quest 5"/>
-          Quest 5
-        </label>
-      </li>
-	  <li>  
+          <input type="radio" name="Quest" value="Map"/>
+          Your friendly map, telling you where locations are found</label></li>
+ <li style="height: 35px">  
         <label>
-          <input type="radio" name="Quest" value="Quest 6"/>
-          Quest 6
-        </label>
-      </li>
-      <li>  
+          <input type="radio" name="Quest" value="MapInfo"/>
+          Information about a location on the map <input name="MapName" type="text" />
+ </label></li>
+ <li style="height: 35px">  
         <label>
-          <input type="radio" name="Quest" value="Quest 7"/>
-          Quest 7
-        </label>
-      </li>
-      <li>  
+          <input type="radio" name="Quest" value="gotoLocation"/>
+         Visit Location <input name="LocationName" type="text" />
+ </label></li>
+ <li style="height: 35px"> 
         <label>
-          <input type="radio" name="Quest" value="Quest 8"/>
-          Quest 8
-        </label>
-      </li>
-      <li>  
+          <input type="radio" name="Quest" value="UserList"/>
+          The list of users</label></li>
+ <li style="height: 35px"> 
         <label>
-          <input type="radio" name="Quest" value="Quest 9"/>
-          Quest 9</label></li>
+          <input type="radio" name="Quest" value="UserDetails"/>
+          Shows details about a single user <input name="UserName" type="text" /></label></li>
 		<li>
-		<input name="Submit1" type="submit" value="Starten" />
-</li>
+		<input name="Submit1" type="submit" value="Starten" /></li>
     </ul> 
-  </fieldset>
-</form>	
+    </fieldset>
+</form>		
+</div>
 </span>	
-<textarea  name="TextArea1" style="width: 572px; height: 227px" readonly="readonly">
-TEXT HIER EINFÜGEN ${helloContent}</textarea>
+<div id="Ebene1" style="position: absolute; width: 800px; height: 500px; z-index: 1; left: 725px; top: 15px">
+<textarea id="textarea" name="TextArea1" style="width: 800px; height: 500px" readonly="readonly" cols="20" rows="1">$!{helloContent}
+</textarea></div>
 </body>
 </html>

@@ -1,0 +1,128 @@
+swagger: '2.0'
+info:
+  description: >-
+    Tavern Service
+  version: 1.0.0
+  title: Tavern
+  termsOfService: 'http://swagger.io/terms/'
+basePath: /v1
+schemes:
+  - http
+paths:
+  /offers:
+    post:
+      summary: Add a hero offer to tavern
+      description: ''
+      operationId: addOffer
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Hero to be added to tavern
+          required: true
+          schema:
+            $ref: '#/definitions/Hero'
+      responses:
+        '202':
+          description: Created
+        '405':
+          description: Invalid input
+    put:
+      summary: Update an existing hero offer
+      description: ''
+      operationId: updateOffer
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Updated hero
+          required: true
+          schema:
+            $ref: '#/definitions/Hero'
+      responses:
+        '200':
+          description: Successfully updated
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Hero not found
+    delete:
+      summary: Delete offer
+      description: ''
+      operationId: deleteOffer
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: The offer that needs to be deleted
+          required: true
+          schema:
+            $ref: '#/definitions/Hero'
+      responses:
+        '202':
+          description: Successfully deleted
+        '404':
+          description: Offer not found
+    get:
+      summary: Return all offers
+      description: ''
+      operationId: getOffers
+      produces:
+        - application/json
+      responses:
+        '200':
+          description:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Hero'
+  /offers/findByClass:
+    get:
+      summary: Finds Offers by class
+      description: Multiple Classes separate with comma
+      operationId: findOfferByClass
+      produces:
+        - application/json
+      parameters:
+        - name: class
+          in: query
+          description: Class filter
+          required: true
+          type: string
+          enum:
+            - mage
+            - warrior
+            - priest
+            - rogue
+          default: mage
+      responses:
+        '200':
+          description:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Hero'
+        '400':
+          description: Invalid status value
+definitions:
+  Hero:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      heroClass:
+        type: string
+        description: Hero Class
+      host:
+        type: string
+description: Host Address
