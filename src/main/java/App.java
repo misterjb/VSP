@@ -34,7 +34,7 @@ public class App {
 			//request.queryParams("txt_username");
 			//request.queryParams("txt_password");
 			Map model = new HashMap<>();
-			model.put("helloContent", test);			
+			model.put("Ausgabe", test);			
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));		
 		});
 		post("/index", (request, response) -> {
@@ -45,7 +45,7 @@ public class App {
 			//request.queryParams("txt_password");
 			Map model = new HashMap<>();
 			test = request.queryParams("Quest");
-			model.put("helloContent", test);			
+			model.put("Ausgabe", test);			
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));		
 		});
 	}
