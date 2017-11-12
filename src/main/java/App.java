@@ -31,30 +31,30 @@ public class App {
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
 		post("/index", (request, response) -> {
-			if (request.queryParams("Quest").equals("DetailsDeliverable")) {
-				DetailsDeliverable(request.queryParams("DeliverablesID"));
-			} else if (request.queryParams("Quest").equals("DeliveriesList")) {
-				DeliveriesList();
-			} else if (request.queryParams("Quest").equals("DetailsDelivery")) {
-				DetailsDelivery(request.queryParams("DeliveryID"));
-			} else if (request.queryParams("Quest").equals("QuestsList")) {
-				QuestsList();
-			} else if (request.queryParams("Quest").equals("detailsQuest")) {
-				detailsQuest(request.queryParams("detailsQuestID"));
-			} else if (request.queryParams("Quest").equals("QuestTaskList")) {
-				QuestTaskList(request.queryParams("tasklistQuestID"));
-			} else if (request.queryParams("Quest").equals("TaskDetails")) {
-				TaskDetails(request.queryParams("detailsTaskID"));
-			} else if (request.queryParams("Quest").equals("Map")) {
-				Map();
-			} else if (request.queryParams("Quest").equals("MapInfo")) {
-				MapInfo(request.queryParams("MapName"));
-			} else if (request.queryParams("Quest").equals("UserList")) {
-				UserList();
-			} else if (request.queryParams("Quest").equals("UserDetails")) {
-				UserDetails(request.queryParams("UserName"));
+			if (request.queryParams("Quest").equals("deliverableDetails")) {
+				showDeliverableDetails(request.queryParams("deliverablesID"));
+			} else if (request.queryParams("Quest").equals("deliveriesList")) {
+				showDeliveriesList();
+			} else if (request.queryParams("Quest").equals("deliveryDetails")) {
+				showDeliveryDetails(request.queryParams("deliveryID"));
+			} else if (request.queryParams("Quest").equals("questsList")) {
+				showQuestsList();
+			} else if (request.queryParams("Quest").equals("questDetails")) {
+				showQuestDetails(request.queryParams("detailsQuestID"));
+			} else if (request.queryParams("Quest").equals("questTaskList")) {
+				showQuestTaskList(request.queryParams("tasklistQuestID"));
+			} else if (request.queryParams("Quest").equals("taskDetails")) {
+				showTaskDetails(request.queryParams("detailsTaskID"));
+			} else if (request.queryParams("Quest").equals("map")) {
+				showMap();
+			} else if (request.queryParams("Quest").equals("mapInfo")) {
+				showMapInfo(request.queryParams("MapName"));
+			} else if (request.queryParams("Quest").equals("userList")) {
+				showUserList();
+			} else if (request.queryParams("Quest").equals("userDetails")) {
+				showUserDetails(request.queryParams("UserName"));
 			} else if (request.queryParams("Quest").equals("gotoLocation")) {
-				gotoLocation(request.queryParams("LocationName"));
+				gotoLocation(request.queryParams("locationName"));
 			}
 			model = new HashMap<>();
 			test = request.queryParams("Quest");
@@ -71,73 +71,73 @@ public class App {
 
 	// UserDetails UserName=name "/users/{name}" Shows details about a single
 	// user
-	private static void UserDetails(String name) {
+	private static void showUserDetails(String name) {
 		// TODO Auto-generated method stub
 
 	}
 
 	// UserList "/users" The list of users
-	private static void UserList() {
+	private static void showUserList() {
 		// TODO Auto-generated method stub
 
 	}
 
 	// MapInfo MapName=name "/map/{name}" Information about a location on the
 	// map
-	private static void MapInfo(String name) {
+	private static void showMapInfo(String name) {
 		// TODO Auto-generated method stub
 
 	}
 
 	// Map "/map" Your friendly map, telling you where locations are found
-	private static void Map() {
+	private static void showMap() {
 		// TODO Auto-generated method stub
 
 	}
 
 	// TaskDetails detailsTaskID=id"/blackboard/tasks/{id} " Details about a
 	// single task
-	private static void TaskDetails(String id) {
+	private static void showTaskDetails(String id) {
 		// TODO Auto-generated method stub
 
 	}
 
 	// QuestTaskList tasklistQuestID=id "/blackboard/quests/{id}/tasks" Lists
 	// the tasks to be fulfilled to solve the quest
-	private static void QuestTaskList(String id) {
+	private static void showQuestTaskList(String id) {
 		// TODO Auto-generated method stub
 
 	}
 
 	// detailsQuest detailsQuestID=id "/blackboard/quests/{id}" Shows details
 	// about the quest
-	private static void detailsQuest(String id) {
+	private static void showQuestDetails(String id) {
 		// TODO Auto-generated method stub
 
 	}
 
 	// QuestsList "/blackboard/quests" Lists the quests available
-	private static void QuestsList() {
+	private static void showQuestsList() {
 		// TODO Auto-generated method stub
 
 	}
 
 	// DetailsDelivery DeliveryID=id"/blackboard/deliveries/{id}" Details about
 	// a single delivery
-	private static void DetailsDelivery(String id) {
+	private static void showDeliveryDetails(String id) {
 		// TODO Auto-generated method stub
 
 	}
 
 	// DeliveriesList "/blackboard/deliveries" Lists the deliveries
-	private static void DeliveriesList() {
+	private static void showDeliveriesList() {
 		// TODO Auto-generated method stub
 
 	}
 
 	// DetailsDeliverable DeliverablesID=id "/blackboard/deliverables/{id}"
 	// Details about a single deliverable
-	private static void DetailsDeliverable(String id) {
+	private static void showDeliverableDetails(String id) {
 		// TODO Auto-generated method stub
 	}
 }
