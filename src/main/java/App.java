@@ -8,43 +8,43 @@ import spark.template.velocity.VelocityTemplateEngine;
 import static spark.Spark.*;
 
 public class App {
-	private static String test="";
+	private static String test = "";
 	private static HashMap model;
-	private static String BlackboardIP,BlackboardPort;
-	
-	public static void main(String[] args) {	
+	private static String blackboard_IP, blackboard_Port;
+
+	public static void main(String[] args) {
 		get("/", (request, response) -> {
 			try {
-			      int port = 24000;
-			      
-			      // Create a socket to listen on the port.
-			      DatagramSocket dsocket = new DatagramSocket(port);
-			      
-			      // Create a buffer to read datagrams into. If a
-			      // packet is larger than this buffer, the
-			      // excess will simply be discarded!
-			      byte[] buffer = new byte[2048];
+				int port = 24000;
 
-			      // Create a packet to receive data into the buffer
-			      DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+				// Create a socket to listen on the port.
+				DatagramSocket dsocket = new DatagramSocket(port);
 
-			      // Wait to receive a datagram
-			      dsocket.receive(packet);
+				// Create a buffer to read datagrams into. If a
+				// packet is larger than this buffer, the
+				// excess will simply be discarded!
+				byte[] buffer = new byte[2048];
 
-			      // Convert the contents to a string, and display them
-			      String msg = new String(buffer, 0, packet.getLength());
-			      test += "IP: "+packet.getAddress().toString().substring(1)+"\n";
-			      msg = msg.substring(msg.lastIndexOf(':') + 1,msg.length()-1);
-			      test +="Port: "+msg+"\n";
-			      
-			      BlackboardPort= msg;
-			      BlackboardIP= packet.getAddress().toString().substring(1);
-			      
-			      // Reset the length of the packet before reusing it.
-			      packet.setLength(buffer.length);			        
-			    } catch (Exception e) {
-			      System.err.println(e);
-			    }
+				// Create a packet to receive data into the buffer
+				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+
+				// Wait to receive a datagram
+				dsocket.receive(packet);
+
+				// Convert the contents to a string, and display them
+				String msg = new String(buffer, 0, packet.getLength());
+				test += "IP: " + packet.getAddress().toString().substring(1) + "\n";
+				msg = msg.substring(msg.lastIndexOf(':') + 1, msg.length() - 1);
+				test += "Port: " + msg + "\n";
+
+				blackboard_Port = msg;
+				blackboard_IP = packet.getAddress().toString().substring(1);
+
+				// Reset the length of the packet before reusing it.
+				packet.setLength(buffer.length);
+			} catch (Exception e) {
+				System.err.println(e);
+			}
 			Map<String, Object> model = new HashMap<>();
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/login.vtl"));
 		});
@@ -55,7 +55,8 @@ public class App {
 			// curl 172.19.0.3:5000/whoami -H "Accept: application/json" -H
 			// 'Authorization: Token <tokenvalue>'
 			String LoginOderRegisterrequest = request.queryParams("btn");
-			test += request.queryParams("txt_username") + request.queryParams("txt_password") + LoginOderRegisterrequest;
+			test += request.queryParams("txt_username") + request.queryParams("txt_password")
+					+ LoginOderRegisterrequest;
 			response.redirect("/index");
 			return null;
 		});
@@ -65,30 +66,43 @@ public class App {
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
 		post("/index", (request, response) -> {
-			if (request.queryParams("Quest").equals("deliverableDetails")) {
+			switch (request.queryParams("Quest")) {
+			case "deliverableDetails":
 				showDeliverableDetails(request.queryParams("deliverablesID"));
-			} else if (request.queryParams("Quest").equals("deliveriesList")) {
+				break;
+			case "deliveriesList":
 				showDeliveriesList();
-			} else if (request.queryParams("Quest").equals("deliveryDetails")) {
+				break;
+			case "deliveryDetails":
 				showDeliveryDetails(request.queryParams("deliveryID"));
-			} else if (request.queryParams("Quest").equals("questsList")) {
+				break;
+			case "questsList":
 				showQuestsList();
-			} else if (request.queryParams("Quest").equals("questDetails")) {
+				break;
+			case "questDetails":
 				showQuestDetails(request.queryParams("detailsQuestID"));
-			} else if (request.queryParams("Quest").equals("questTaskList")) {
+				break;
+			case "questTaskList":
 				showQuestTaskList(request.queryParams("tasklistQuestID"));
-			} else if (request.queryParams("Quest").equals("taskDetails")) {
+				break;
+			case "taskDetails":
 				showTaskDetails(request.queryParams("detailsTaskID"));
-			} else if (request.queryParams("Quest").equals("map")) {
+				break;
+			case "map":
 				showMap();
-			} else if (request.queryParams("Quest").equals("mapInfo")) {
+				break;
+			case "mapInfo":
 				showMapInfo(request.queryParams("MapName"));
-			} else if (request.queryParams("Quest").equals("userList")) {
+				break;
+			case "userList":
 				showUserList();
-			} else if (request.queryParams("Quest").equals("userDetails")) {
+				break;
+			case "userDetails":
 				showUserDetails(request.queryParams("UserName"));
-			} else if (request.queryParams("Quest").equals("gotoLocation")) {
+				break;
+			case "gotoLocation":
 				gotoLocation(request.queryParams("locationName"));
+				break;
 			}
 			model = new HashMap<>();
 			test += request.queryParams("Quest");
