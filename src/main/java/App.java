@@ -8,7 +8,7 @@ import spark.template.velocity.VelocityTemplateEngine;
 import static spark.Spark.*;
 
 public class App {
-	private static String test = "";
+	private static String ausgabe = "";
 	private static HashMap model;
 	private static String blackboard_IP, blackboard_Port;
 
@@ -33,15 +33,17 @@ public class App {
 
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, packet.getLength());
-				test += "IP: " + packet.getAddress().toString().substring(1) + "\n";
+				//ausgabe += "IP: " + packet.getAddress().toString().substring(1) + "\n";
 				msg = msg.substring(msg.lastIndexOf(':') + 1, msg.length() - 1);
-				test += "Port: " + msg + "\n";
+				//ausgabe += "Port: " + msg + "\n";
 
 				blackboard_Port = msg;
 				blackboard_IP = packet.getAddress().toString().substring(1);
 
 				// Reset the length of the packet before reusing it.
 				packet.setLength(buffer.length);
+				
+				dsocket.close();
 			} catch (Exception e) {
 				System.err.println(e);
 			}
@@ -55,14 +57,13 @@ public class App {
 			// curl 172.19.0.3:5000/whoami -H "Accept: application/json" -H
 			// 'Authorization: Token <tokenvalue>'
 			String LoginOderRegisterrequest = request.queryParams("btn");
-			test += request.queryParams("txt_username") + request.queryParams("txt_password")
-					+ LoginOderRegisterrequest;
+			//ausgabe += request.queryParams("txt_username") + request.queryParams("txt_password")+ LoginOderRegisterrequest;
 			response.redirect("/index");
 			return null;
 		});
 		get("/index", (request, response) -> {
 			Map model = new HashMap<>();
-			model.put("Ausgabe", test);
+			model.put("Ausgabe", ausgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
 		post("/index", (request, response) -> {
@@ -103,10 +104,8 @@ public class App {
 			case "gotoLocation":
 				gotoLocation(request.queryParams("locationName"));
 				break;
-			}
-			model = new HashMap<>();
-			test += request.queryParams("Quest");
-			model.put("Ausgabe", test);
+			}			
+			model.put("Ausgabe", ausgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
 	}
