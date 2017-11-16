@@ -9,7 +9,6 @@ import static spark.Spark.*;
 
 public class App {
 	private static String ausgabe = "";
-	private static HashMap model;
 	private static String blackboard_IP, blackboard_Port;
 
 	public static void main(String[] args) {
@@ -103,11 +102,21 @@ public class App {
 				break;
 			case "gotoLocation":
 				gotoLocation(request.queryParams("locationName"));
+				break;			
+			case "allinOne":
+				completeQuestOne();
 				break;
-			}			
+			}	
+			ausgabe = request.queryParams("Quest");
+			Map model = new HashMap<>();
 			model.put("Ausgabe", ausgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
+	}
+
+	private static void completeQuestOne() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	// gotoLocation LocationName=name Visit Location host/visits
