@@ -17,7 +17,6 @@
         </plugins>
     </build>
     <name>new-spark-project</name>
-
     <dependencies>
         <dependency>
             <groupId>com.sparkjava</groupId>

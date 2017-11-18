@@ -1,12 +1,17 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.body.Body;
 import spark.ModelAndView;
 import spark.template.velocity.VelocityTemplateEngine;
+
+import static org.json.zip.JSONzip.end;
 import static spark.Spark.*;
 
 public class App {
@@ -15,8 +20,10 @@ public class App {
 	private static String hostLocation = "";
 	private static String nameLocation = "";
 	private static String authenticationToken = "";
+	private static String username = "jannikb";
+	private static String password = "jannikb";
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnirestException {
 		get("/", (request, response) -> {
 			try {
 				int port = 24000;
@@ -46,7 +53,10 @@ public class App {
 
 				// Reset the length of the packet before reusing it.
 				packet.setLength(buffer.length);
-				
+
+				registerUser();
+				login();
+
 				dsocket.close();
 			} catch (Exception e) {
 				System.err.println(e);
@@ -119,6 +129,30 @@ public class App {
 		});
 	}
 
+	private static void registerUser() throws UnirestException {
+		Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/users")
+				.field("name", username)
+				.field("password", password)
+				.asJson();
+	}
+
+	private static void login() throws UnirestException {
+		String loginResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/login")
+				.basicAuth(username, password).asString().getBody();
+		System.out.println(loginResponse);
+
+		String[] parts = loginResponse.split(","); //split to get the token part
+		String[] parts2 = parts[1].split("\""); //split to get the token
+		//the unclean way (does work at the moment)
+		String token = parts2[3];
+
+		authenticationToken = token;
+		// how its supposed to be (does not work at the moment)
+		/*authenticationToken = loginResponse.substring(loginResponse
+				.indexOf("\"token\": \"") + 1, loginResponse.indexOf("\""));*/
+		System.out.println("Logged in. Authentication token: " +  authenticationToken);
+	}
+
 	private static void completeQuestOne() {
 		// TODO Auto-generated method stub
 		
@@ -153,7 +187,7 @@ public class App {
 	// Map "/map" Your friendly map, telling you where locations are found
 	private static void showMap() {
 		System.out.println(blackboard_IP + " : " +  blackboard_Port);
-		Body locationResponse = Unirest.get(blackboard_IP + "/map").getBody();
+		Body locationResponse = Unirest.get(blackboard_IP + "/map").getBody(); // fehlt der port
 		System.out.println(locationResponse.toString()); // null
 		String locationString = locationResponse.toString();
 		hostLocation = locationString.substring(locationString
