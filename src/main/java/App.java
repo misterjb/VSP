@@ -1,24 +1,15 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.body.Body;
 import spark.ModelAndView;
 import spark.template.velocity.VelocityTemplateEngine;
 import static spark.Spark.*;
 
 public class App {
 	private static String ausgabe = "";
-	private static String blackboard_IP = "", blackboard_Port = "";
-	private static String hostLocation = "";
-	private static String nameLocation = "";
-	private static String authenticationToken = "";
+	private static String blackboard_IP, blackboard_Port;
 
 	public static void main(String[] args) {
 		get("/", (request, response) -> {
@@ -156,16 +147,8 @@ public class App {
 
 	// Map "/map" Your friendly map, telling you where locations are found
 	private static void showMap() {
-		System.out.println(blackboard_IP + " : " +  blackboard_Port);
-		Body locationResponse = Unirest.get(blackboard_IP + "/map").getBody();
-		System.out.println(locationResponse.toString()); // null
-		String locationString = locationResponse.toString();
-		hostLocation = locationString.substring(locationString
-				.indexOf("\"host\": \"") + 1, locationString.indexOf("\""));
-		System.out.println("Host of location: " +  hostLocation);
-		nameLocation = locationString.substring(locationString
-				.indexOf("\"name\": \"") + 1, locationString.indexOf("\""));
-		System.out.println("Name of location: " + nameLocation);
+		// TODO Auto-generated method stub
+
 	}
 
 	// TaskDetails detailsTaskID=id"/blackboard/tasks/{id} " Details about a
