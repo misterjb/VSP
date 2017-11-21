@@ -30,6 +30,7 @@ public class App {
 	private static String my_IP = "172.19.0.24";
 	private static String my_Group;
 	private static ArrayList<String> questList = new ArrayList<>();
+	private static String loginFehlerAusgabe = "";
 
 	public static void main(String[] args) throws UnirestException {
 		get("/", (request, response) -> {
@@ -102,30 +103,37 @@ public class App {
 			} catch (Exception e) {
 				System.err.println(e);
 			}
-			Map<String, Object> model = new HashMap<>();
+			Map<String, String> model = new HashMap<>();
+			model.put("Ausgabe", loginFehlerAusgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/login.vtl"));
 		});
 		post("/login", (request, response) -> {
-			if(request.queryParams("btn").equals("Register"))
-			{
-				System.out.println("-----------------------------------------------------------------------------------");
+			if (request.queryParams("btn").equals("Register")) {
+				System.out
+						.println("-----------------------------------------------------------------------------------");
 				System.out.println("registerUser");
-				System.out.println("-----------------------------------------------------------------------------------");
-				try{
-					registerUser(request.queryParams("txt_username"),request.queryParams("txt_password"));
-				}catch (Exception e) {					
-					Map<String, Object> model = new HashMap<>();
-					model.put("Ausgabe", "Benutzer schon vorhanden");
-					return new VelocityTemplateEngine().render(new ModelAndView(model, "/login.vtl"));
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+
+				registerUser(request.queryParams("txt_username"), request.queryParams("txt_password"));
+				if (loginFehlerAusgabe.equals("Username already taken")) {
+					response.redirect("/");
 				}
-				
+
 			}
-			System.out.println("-----------------------------------------------------------------------------------");
-			System.out.println("login");
-			System.out.println("-----------------------------------------------------------------------------------");
-			login(request.queryParams("txt_username"),request.queryParams("txt_password"));
-			System.out.println("-----------------------------------------------------------------------------------");
-			response.redirect("/index");
+			if (!loginFehlerAusgabe.equals("Username already taken")) {
+				loginFehlerAusgabe="";
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+				System.out.println("login");
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+				login(request.queryParams("txt_username"), request.queryParams("txt_password"));
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+				ausgabe += "Erfolgreich eingeloggt";
+				response.redirect("/index");
+			}
 			return null;
 		});
 		get("/index", (request, response) -> {
@@ -180,7 +188,7 @@ public class App {
 			model.put("Ausgabe", ausgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
-		//TODO Aufgabe 2
+		// TODO Aufgabe 2
 		post("/taverna", (request, response) -> {
 			Gson gson = new Gson();
 			Registration reg = gson.fromJson(request.body(), Registration.class);
@@ -218,11 +226,13 @@ public class App {
 
 	/**
 	 * geht wohl noch nicht!
-	 * @throws UnirestException 
+	 * 
+	 * @throws UnirestException
 	 */
 	private static void registerUser(String username, String password) throws UnirestException {
-		Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/users").field("name", username)
-				.field("password", password).asJson();
+		JsonNode jsonResponse = Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/users")
+				.field("name", username).field("password", password).asJson().getBody();
+		loginFehlerAusgabe = jsonResponse.getObject().get("message").toString();
 	}
 
 	private static void login(String username, String password) throws UnirestException {
