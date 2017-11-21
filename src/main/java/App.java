@@ -1,10 +1,15 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.nio.channels.spi.SelectorProvider;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.body.Body;
@@ -17,11 +22,12 @@ import static spark.Spark.*;
 public class App {
 	private static String ausgabe = "";
 	private static String blackboard_IP = "", blackboard_Port = "";
-	private static String hostLocation = "";
-	private static String nameLocation = "";
+	private static String locationName = "";
+	private static String locationHost = "";
 	private static String authenticationToken = "";
 	private static String username = "jannikb";
 	private static String password = "jannikb";
+	private static ArrayList<String> questList = new ArrayList<>();
 
 	public static void main(String[] args) throws UnirestException {
 		get("/", (request, response) -> {
@@ -54,8 +60,38 @@ public class App {
 				// Reset the length of the packet before reusing it.
 				packet.setLength(buffer.length);
 
+				System.out.println("-----------------------------------------------------------------------------------");
+				System.out.println("registerUser");
+				System.out.println("-----------------------------------------------------------------------------------");
 				registerUser();
+				System.out.println("-----------------------------------------------------------------------------------");
+				System.out.println("login");
+				System.out.println("-----------------------------------------------------------------------------------");
 				login();
+				System.out.println("-----------------------------------------------------------------------------------");
+				System.out.println("showQuestsList");
+				System.out.println("-----------------------------------------------------------------------------------");
+				showQuestsList();
+				System.out.println("-----------------------------------------------------------------------------------");
+				System.out.println("showTaskDetails");
+				System.out.println("-----------------------------------------------------------------------------------");
+				//showTaskDetails("1");
+				System.out.println("-----------------------------------------------------------------------------------");
+				System.out.println("showMap");
+				System.out.println("-----------------------------------------------------------------------------------");
+				showMap();
+				System.out.println("-----------------------------------------------------------------------------------");
+				System.out.println("showMapInfo");
+				System.out.println("-----------------------------------------------------------------------------------");
+				showMapInfo("Throneroom");
+				System.out.println("-----------------------------------------------------------------------------------");
+				System.out.println("gotoLocation");
+				System.out.println("-----------------------------------------------------------------------------------");
+				gotoLocation("Throneroom");
+				System.out.println("-----------------------------------------------------------------------------------");
+				System.out.println("deliver");
+				System.out.println("-----------------------------------------------------------------------------------");
+				deliver("1");
 
 				dsocket.close();
 			} catch (Exception e) {
@@ -129,6 +165,9 @@ public class App {
 		});
 	}
 
+	/**
+	 * geht wohl noch nicht!
+	 */
 	private static void registerUser() throws UnirestException {
 		Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/users")
 				.field("name", username)
@@ -159,9 +198,30 @@ public class App {
 	}
 
 	// gotoLocation LocationName=name Visit Location host/visits
-	private static void gotoLocation(String name) {
-		// TODO Auto-generated method stub
+	private static void gotoLocation(String name) throws UnirestException {
+		//search for name and take the host of it
+		Unirest.get("http://" + "172.19.0.4:5000" + "/visits") //fixed host for throneroom
+				.header("Accept", "application/json")
+				.header("Authorization",  "Token " +authenticationToken);
 
+		System.out.println("ICH RASTE AUS!!");
+
+		HttpResponse<JsonNode> questResponse = Unirest.post("http://" + "172.19.0.4:5000" + "/visits")
+				.header("Accept", "application/json")
+				.header("Authorization",  "Token " +authenticationToken)
+				.asJson();
+		System.out.println(questResponse.getBody().toString());
+		String questInfo = questResponse.getBody().toString();
+		System.out.println("Info of location: " +  questInfo);
+
+    /*MultipartBody jsonResponse = Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/visits/" + name)
+        .header("Accept", "application/json")
+        .field("Authorization: Token ", authenticationToken)
+        ;*/
+    /*
+    Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/visits/" + name)
+        .header("Authorization: Token ", authenticationToken)
+        .asJson();*/
 	}
 
 	// UserDetails UserName=name "/users/{name}" Shows details about a single
@@ -179,50 +239,90 @@ public class App {
 
 	// MapInfo MapName=name "/map/{name}" Information about a location on the
 	// map
-	private static void showMapInfo(String name) {
-		// TODO Auto-generated method stub
-
+	private static void showMapInfo(String name) throws UnirestException {
+		HttpResponse<JsonNode> locationResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/map/" + name).asJson();
+		System.out.println(locationResponse.getBody().toString());
+		String locationInfo = locationResponse.getBody().toString();
+		System.out.println("Info of location: " +  locationInfo);
 	}
 
 	// Map "/map" Your friendly map, telling you where locations are found
-	private static void showMap() {
-		System.out.println(blackboard_IP + " : " +  blackboard_Port);
-		Body locationResponse = Unirest.get(blackboard_IP + "/map").getBody(); // fehlt der port
-		System.out.println(locationResponse.toString()); // null
-		String locationString = locationResponse.toString();
-		hostLocation = locationString.substring(locationString
-				.indexOf("\"host\": \"") + 1, locationString.indexOf("\""));
-		System.out.println("Host of location: " +  hostLocation);
-		nameLocation = locationString.substring(locationString
-				.indexOf("\"name\": \"") + 1, locationString.indexOf("\""));
-		System.out.println("Name of location: " + nameLocation);
+	private static void showMap() throws UnirestException {
+		HttpResponse<JsonNode> locationResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/map").asJson();
+		String locationString = locationResponse.getBody().toString();
+		System.out.println(locationString);
+		// shows first location
+
+
+		locationHost = locationString.substring(locationString.indexOf("\"host\":\"") + 8, locationString.indexOf("\"",locationString.indexOf("\"host\":\"") + 8));
+		System.out.println("Host of location: " + locationHost);                          // to " from "name":"
+		locationName = locationString.substring(locationString.indexOf("\"name\":\"") + 8, locationString.indexOf("\"",locationString.indexOf("\"name\":\"") + 8));
+		System.out.println("Name of location: " + locationName);
 	}
 
 	// TaskDetails detailsTaskID=id"/blackboard/tasks/{id} " Details about a
 	// single task
-	private static void showTaskDetails(String id) {
-		// TODO Auto-generated method stub
+	private static void showTaskDetails(String id) throws UnirestException {
+		Body taskResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/tasks/" + id).basicAuth("Authorization: Token ", authenticationToken)
+				.getBody();
+		System.out.println(taskResponse.toString());
+		String taskInfo = taskResponse.toString();
+		System.out.println("Info of Task [" + id + "]: " +  taskInfo);
 
+    /*Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + id + "/deliveries")
+        .header("Authorization: Token ", authenticationToken)
+        .asJson();*/
 	}
 
 	// QuestTaskList tasklistQuestID=id "/blackboard/quests/{id}/tasks" Lists
 	// the tasks to be fulfilled to solve the quest
 	private static void showQuestTaskList(String id) {
-		// TODO Auto-generated method stub
+		Body questResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests" + id + "/tasks").getBody();
+		String questtaskString = questResponse.toString();
+		String tasks = questtaskString.substring(questtaskString
+				.indexOf("\"tasks\": [") + 1, questtaskString.indexOf("]"));
+
+		Pattern pattern = Pattern.compile("[/a-zA-Z0-9]+");
+		Matcher matcher = pattern.matcher(tasks);
+		ArrayList<String> questtaskList = new ArrayList<>();
+		while (matcher.find()) {
+			questtaskList.add(matcher.group());
+		}
+		int i = 1;
+		for(String quest : questtaskList) {
+			System.out.println("Quest " + i + " is: " + quest);
+			i++;
+		}
 
 	}
 
 	// detailsQuest detailsQuestID=id "/blackboard/quests/{id}" Shows details
 	// about the quest
 	private static void showQuestDetails(String id) {
-		// TODO Auto-generated method stub
-
+		Body questResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + id).getBody();
+		System.out.println(questResponse.toString());
+		String questInfo = questResponse.toString();
+		System.out.println("Info of Quest [" + id + "]: " +  questInfo);
 	}
 
 	// QuestsList "/blackboard/quests" Lists the quests available
-	private static void showQuestsList() {
-		// TODO Auto-generated method stub
+	private static void showQuestsList() throws UnirestException {
+		HttpResponse<JsonNode> questResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests").asJson();
+		String questString = questResponse.getBody().toString();
+		System.out.println(questString);
+		String tasks = questString.substring(questString
+				.indexOf("\"tasks\": [") + 1, questString.indexOf("]"));
 
+		Pattern pattern = Pattern.compile("[/a-zA-Z0-9]+");
+		Matcher matcher = pattern.matcher(tasks);
+		while (matcher.find()) {
+			questList.add(matcher.group());
+		}
+		int i = 1;
+		for(String quest : questList) {
+			System.out.println("Quest " + i + " is: " + quest);
+			i++;
+		}
 	}
 
 	// DetailsDelivery DeliveryID=id"/blackboard/deliveries/{id}" Details about
@@ -242,5 +342,13 @@ public class App {
 	// Details about a single deliverable
 	private static void showDeliverableDetails(String id) {
 		// TODO Auto-generated method stub
+	}
+
+	// Deliver DeliverablesID=id "/blackboard/quests/{id}/deliveries"
+	// Details about a single deliverable
+	private static void deliver(String id) throws UnirestException {
+		Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + id + "/deliveries")
+				.header("Authorization: Token ", authenticationToken)
+				.asJson();
 	}
 }
