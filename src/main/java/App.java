@@ -1,27 +1,35 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.nio.channels.spi.SelectorProvider;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.json.JSONObject;
+
+import com.google.gson.Gson;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.body.Body;
 import spark.ModelAndView;
 import spark.template.velocity.VelocityTemplateEngine;
 
-import static org.json.zip.JSONzip.end;
 import static spark.Spark.*;
 
 public class App {
 	private static String ausgabe = "";
 	private static String blackboard_IP = "", blackboard_Port = "";
-	private static String hostLocation = "";
-	private static String nameLocation = "";
+	private static String locationName = "";
+	private static String locationHost = "";
 	private static String authenticationToken = "";
-	private static String username = "jannikb";
-	private static String password = "jannikb";
+	private static HashMap<String, String> locationMap = new HashMap<>();
+	private static String my_IP = "172.19.0.24";
+	private static String my_Group;
+	private static ArrayList<String> questList = new ArrayList<>();
+	private static String loginFehlerAusgabe = "";
+	private static Object locationToken;
 
 	public static void main(String[] args) throws UnirestException {
 		get("/", (request, response) -> {
@@ -44,35 +52,52 @@ public class App {
 
 				// Convert the contents to a string, and display them
 				String msg = new String(buffer, 0, packet.getLength());
-				//ausgabe += "IP: " + packet.getAddress().toString().substring(1) + "\n";
+				// ausgabe += "IP: " +
+				// packet.getAddress().toString().substring(1) + "\n";
 				msg = msg.substring(msg.lastIndexOf(':') + 1, msg.length() - 1);
-				//ausgabe += "Port: " + msg + "\n";
+				// ausgabe += "Port: " + msg + "\n";
 
 				blackboard_Port = msg;
 				blackboard_IP = packet.getAddress().toString().substring(1);
 
 				// Reset the length of the packet before reusing it.
 				packet.setLength(buffer.length);
-
-				registerUser();
-				login();
-
 				dsocket.close();
 			} catch (Exception e) {
 				System.err.println(e);
 			}
-			Map<String, Object> model = new HashMap<>();
+			Map<String, String> model = new HashMap<>();
+			model.put("Ausgabe", loginFehlerAusgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/login.vtl"));
 		});
 		post("/login", (request, response) -> {
-			// curl -d '{"name":"jannikb", "password":"jannikb"}' -H
-			// "Content-Type: application/json" -X POST 172.19.0.3:5000/users
-			// curl --user jannikb:jannikb 172.19.0.3:5000/login
-			// curl 172.19.0.3:5000/whoami -H "Accept: application/json" -H
-			// 'Authorization: Token <tokenvalue>'
-			String LoginOderRegisterrequest = request.queryParams("btn");
-			//ausgabe += request.queryParams("txt_username") + request.queryParams("txt_password")+ LoginOderRegisterrequest;
-			response.redirect("/index");
+			if (request.queryParams("btn").equals("Register")) {
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+				System.out.println("registerUser");
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+
+				registerUser(request.queryParams("txt_username"), request.queryParams("txt_password"));
+				if (loginFehlerAusgabe.equals("Username already taken")) {
+					response.redirect("/");
+				}
+
+			}
+			if (!loginFehlerAusgabe.equals("Username already taken")) {
+				loginFehlerAusgabe = "";
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+				System.out.println("login");
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+				login(request.queryParams("txt_username"), request.queryParams("txt_password"));
+				System.out
+						.println("-----------------------------------------------------------------------------------");
+				ausgabe+="-----------------------------------------------------------------------------------";
+				ausgabe += "Erfolgreich eingeloggt";
+				response.redirect("/index");
+			}
 			return null;
 		});
 		get("/index", (request, response) -> {
@@ -117,51 +142,144 @@ public class App {
 				break;
 			case "gotoLocation":
 				gotoLocation(request.queryParams("locationName"));
-				break;			
+				break;
 			case "allinOne":
 				completeQuestOne();
 				break;
-			}	
-			ausgabe = request.queryParams("Quest");
+			}
+			//ausgabe = request.queryParams("Quest");
 			Map model = new HashMap<>();
 			model.put("Ausgabe", ausgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
+		// TODO Aufgabe 2
+		post("/taverna", (request, response) -> {
+			Gson gson = new Gson();
+			Registration reg = gson.fromJson(request.body(), Registration.class);
+			response.status(201);
+			// TODO
+			request.headers("Authorization:Token " + authenticationToken);
+			return response;
+		});
+		get("/taverna", (request, response) -> {
+			// TODO logintoken um richtigen user wiederzugeben
+			String jsonString = new JSONObject().put("user", my_IP).put("idle", "false").put("group", my_Group)
+					.put("hirings", "/hirings").put("assignments", "/assignments").put("messages", "/messages")
+					.toString();
+			response.type("application/json");
+			response.status(200);
+			return jsonString;
+		});
+		post("/taverna/hirings", (request, response) -> {
+			Gson gson = new Gson();
+			Groups reg = gson.fromJson(request.body(), Groups.class);
+			// TODO
+			request.headers("Authorization:Token" + authenticationToken);
+			response.status(201);
+			return response;
+		});
+		post("/taverna/assignments", (request, response) -> {
+			Gson gson = new Gson();
+			Assignments asmnt = gson.fromJson(request.body(), Assignments.class);
+			response.status(201);
+			// TODO
+			request.headers("Authorization:Token " + authenticationToken);
+			return response;
+		});
 	}
 
-	private static void registerUser() throws UnirestException {
-		Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/users")
-				.field("name", username)
-				.field("password", password)
-				.asJson();
+	private static void testalles() throws UnirestException {		
+		System.out.println("showQuestsList");
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="showQuestsList\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		showQuestsList();
+		System.out.println("-----------------------------------------------------------------------------------");
+		System.out.println("showTaskDetails");
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "showTaskDetails\n";		
+		showTaskDetails("1"); // geht noch nicht
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showTaskDetails1\n";
+		System.out.println("showMap");
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showMap\n";
+		showMap(); // besseres parsen von name, host
+		System.out.println("-----------------------------------------------------------------------------------");
+		System.out.println("showMapInfo");
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showMapInfo\n";
+		showMapInfo("Throneroom");
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showMapInfo Throneroom\n";
+		System.out.println("gotoLocation");
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="gotoLocation\n";
+		gotoLocation("Throneroom");
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="gotoThroneroom\n";
+		System.out.println("deliver");
+		System.out.println("-----------------------------------------------------------------------------------");
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="deliver\n";
+		deliver("1"); // geht noch nicht
 	}
 
-	private static void login() throws UnirestException {
+	private static void registerUser(String username, String password) throws UnirestException {
+		JSONObject jo = new JSONObject();
+		jo.put("name", username);
+		jo.put("password", password);
+		System.out.println(jo);
+		JsonNode jsonResponse = Unirest.post("http://" + blackboard_IP + ":" + blackboard_Port + "/users").body(jo)
+				.asJson().getBody();
+		System.out.println(jsonResponse);
+		loginFehlerAusgabe = jsonResponse.getObject().get("message").toString();
+	}
+
+	private static void login(String username, String password) throws UnirestException {
 		String loginResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/login")
 				.basicAuth(username, password).asString().getBody();
 		System.out.println(loginResponse);
 
-		String[] parts = loginResponse.split(","); //split to get the token part
-		String[] parts2 = parts[1].split("\""); //split to get the token
-		//the unclean way (does work at the moment)
+		String[] parts = loginResponse.split(","); // split to get the token
+													// part
+		String[] parts2 = parts[1].split("\""); // split to get the token
+		// the unclean way (does work at the moment)
 		String token = parts2[3];
 
 		authenticationToken = token;
 		// how its supposed to be (does not work at the moment)
-		/*authenticationToken = loginResponse.substring(loginResponse
-				.indexOf("\"token\": \"") + 1, loginResponse.indexOf("\""));*/
-		System.out.println("Logged in. Authentication token: " +  authenticationToken);
+		/*
+		 * authenticationToken = loginResponse.substring(loginResponse
+		 * .indexOf("\"token\": \"") + 1, loginResponse.indexOf("\""));
+		 */
+		System.out.println("Logged in. Authentication token: " + authenticationToken);
 	}
 
-	private static void completeQuestOne() {
-		// TODO Auto-generated method stub
-		
+	private static void completeQuestOne() throws UnirestException {
+		testalles();
 	}
 
 	// gotoLocation LocationName=name Visit Location host/visits
-	private static void gotoLocation(String name) {
-		// TODO Auto-generated method stub
-
+	private static void gotoLocation(String name) throws UnirestException {
+		// search for name and take the host of it
+		if (locationMap.containsKey(name)) {
+			HttpResponse<JsonNode> questResponse = Unirest.post("http://" + locationMap.get(name) + "/visits")
+					.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken)
+					.asJson();
+			ausgabe+= questResponse.getBody().toString()+"/n";
+			System.out.println(questResponse.getBody().toString());
+			locationToken = questResponse.getBody().getObject().get("token");
+		} else {
+			System.out.println("Map does not contain: " + name);
+		}
 	}
 
 	// UserDetails UserName=name "/users/{name}" Shows details about a single
@@ -179,50 +297,103 @@ public class App {
 
 	// MapInfo MapName=name "/map/{name}" Information about a location on the
 	// map
-	private static void showMapInfo(String name) {
-		// TODO Auto-generated method stub
-
+	private static void showMapInfo(String name) throws UnirestException {
+		HttpResponse<JsonNode> locationResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/map/" + name).asJson();
+		System.out.println(locationResponse.getBody().toString());
+		String locationInfo = locationResponse.getBody().toString();
+		System.out.println("Info of location: " + locationInfo);
+		ausgabe+=locationInfo+"/n";
 	}
 
 	// Map "/map" Your friendly map, telling you where locations are found
-	private static void showMap() {
-		System.out.println(blackboard_IP + " : " +  blackboard_Port);
-		Body locationResponse = Unirest.get(blackboard_IP + "/map").getBody(); // fehlt der port
-		System.out.println(locationResponse.toString()); // null
-		String locationString = locationResponse.toString();
-		hostLocation = locationString.substring(locationString
-				.indexOf("\"host\": \"") + 1, locationString.indexOf("\""));
-		System.out.println("Host of location: " +  hostLocation);
-		nameLocation = locationString.substring(locationString
-				.indexOf("\"name\": \"") + 1, locationString.indexOf("\""));
-		System.out.println("Name of location: " + nameLocation);
+	private static void showMap() throws UnirestException {
+		HttpResponse<JsonNode> locationResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/map").asJson();
+		String locationString = locationResponse.getBody().toString();
+		System.out.println(locationString);
+
+		int i = 0;
+		while (i < 3) { // nicht hinsehen ... wir benutzen keine magic numbers!!!!!
+			locationHost = locationString.substring(locationString.indexOf("\"host\":\"") + 8,
+					locationString.indexOf("\"", locationString.indexOf("\"host\":\"") + 8));// to " from
+			locationName = locationString.substring(locationString.indexOf("\"name\":\"") + 8,
+					locationString.indexOf("\"", locationString.indexOf("\"name\":\"") + 8));
+
+			locationMap.put(locationName, locationHost);
+
+			int num = locationString.indexOf("\"", locationString.indexOf("\"name\":\"") + 8);
+			String tmp = locationString.substring(num, locationString.length());
+			locationString = tmp;
+			i++;
+		}
+		ausgabe+=Arrays.asList(locationMap)+"/n";
+		System.out.println(Arrays.asList(locationMap));
 	}
 
 	// TaskDetails detailsTaskID=id"/blackboard/tasks/{id} " Details about a
 	// single task
-	private static void showTaskDetails(String id) {
-		// TODO Auto-generated method stub
-
+	private static void showTaskDetails(String id) throws UnirestException {
+		HttpResponse<JsonNode> taskResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/tasks/" + id)
+				.header("Authorization", "Token " + authenticationToken).asJson();
+		System.out.println(taskResponse.getBody());
+		ausgabe+= taskResponse.getBody()+"/n";
 	}
 
 	// QuestTaskList tasklistQuestID=id "/blackboard/quests/{id}/tasks" Lists
 	// the tasks to be fulfilled to solve the quest
 	private static void showQuestTaskList(String id) {
-		// TODO Auto-generated method stub
+		Body questResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + id + "/tasks")
+				.getBody();
+		String questtaskString = questResponse.toString();
+		String tasks = questtaskString.substring(questtaskString.indexOf("\"tasks\": [") + 1,
+				questtaskString.indexOf("]"));
+
+		Pattern pattern = Pattern.compile("[/a-zA-Z0-9]+");
+		Matcher matcher = pattern.matcher(tasks);
+		ArrayList<String> questtaskList = new ArrayList<>();
+		while (matcher.find()) {
+			questtaskList.add(matcher.group());
+		}
+		int i = 1;
+		for (String quest : questtaskList) {
+			System.out.println("Quest " + i + " is: " + quest);
+			i++;
+		}
 
 	}
 
 	// detailsQuest detailsQuestID=id "/blackboard/quests/{id}" Shows details
 	// about the quest
 	private static void showQuestDetails(String id) {
-		// TODO Auto-generated method stub
-
+		Body questResponse = Unirest.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + id)
+				.getBody();
+		System.out.println(questResponse.toString());
+		String questInfo = questResponse.toString();
+		System.out.println("Info of Quest [" + id + "]: " + questInfo);
 	}
 
 	// QuestsList "/blackboard/quests" Lists the quests available
-	private static void showQuestsList() {
-		// TODO Auto-generated method stub
+	private static void showQuestsList() throws UnirestException {
+		HttpResponse<JsonNode> questResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests").asJson();
+		String questString = questResponse.getBody().toString();
+		System.out.println(questString);
+		ausgabe+=questString+"/n";
+		String tasks = questString.substring(questString.indexOf("\"tasks\": [") + 1, questString.indexOf("]"));
 
+		Pattern pattern = Pattern.compile("[/a-zA-Z0-9]+");
+		Matcher matcher = pattern.matcher(tasks);
+		while (matcher.find()) {
+			questList.add(matcher.group());
+		}
+		int i = 1;
+		for (String quest : questList) {
+			System.out.println("Quest " + i + " is: " + quest);
+			i++;
+		}
 	}
 
 	// DetailsDelivery DeliveryID=id"/blackboard/deliveries/{id}" Details about
@@ -242,5 +413,61 @@ public class App {
 	// Details about a single deliverable
 	private static void showDeliverableDetails(String id) {
 		// TODO Auto-generated method stub
+	}
+
+	// Deliver DeliverablesID=id "/blackboard/quests/{id}/deliveries"
+	// Details about a single deliverable
+	private static void deliver(String id) throws UnirestException {
+		JSONObject jo = new JSONObject();
+		jo.put("tokens", new JSONObject().put("/blackboard/tasks/1", locationToken));
+		System.out.println(jo);
+		HttpResponse<JsonNode> deliverResponse = Unirest
+				.post("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + id + "/deliveries")
+				.header("Content-Type", "application/json").header("Authorization", "Token " + authenticationToken)
+				.body(jo).asJson();
+		System.out.println(deliverResponse.getBody());
+		ausgabe+=deliverResponse.getBody()+"/n";
+		//ausgabe+= deliverResponse.getBody().getObject().
+		//System.out.println(deliverResponse.getBody().getObject().get("message"));
+		//System.out.println(deliverResponse.getBody().toString());
+		//String deliveryInfo = deliverResponse.getBody().toString();
+		//System.out.println("Info: " + deliveryInfo);
+	}
+
+	class Registration {
+		String heroclass;
+		String[] capabilities;
+		String url;
+	}
+
+	class Message {
+		String status;
+		String type;
+		String message;
+	}
+
+	class Groups {
+		String group;
+		String quest;
+		Message message;
+
+	}
+
+	class Assignments {
+		String id;
+		String task;
+		String resource;
+		String method;
+		String data;
+		String callback;
+		Message message;
+	}
+
+	class Election {
+		String algorithm;
+		String payload;
+		String user;
+		String job;
+		Message message;
 	}
 }
