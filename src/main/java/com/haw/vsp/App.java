@@ -41,7 +41,7 @@ public class App {
 	private static String loginFehlerAusgabe = "";
 	private static Object locationToken;
 	public static String my_IP;
-	private static int my_PORT = 6000;
+	private static int my_PORT = 4567;
 	private static String my_Group = "11";
 	private static ArrayList<Registration> registration_List = new ArrayList<>();
 	private static ArrayList<Message> message_List = new ArrayList<>();
@@ -53,7 +53,7 @@ public class App {
 		Spark.port(my_PORT);
 		try {
 			my_IP = InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e1) {	
+		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
 		if (my_IP.equals("192.168.2.51")) {
@@ -61,7 +61,7 @@ public class App {
 		} else {
 			my_IP = "http://" + my_IP + ":" + my_PORT;
 		}
-		System.out.println(my_IP);	
+		System.out.println(my_IP);
 		/*
 		 * • heroclass: describe your trade – you may be creative here •
 		 * capabilities: you have not earned any yet, so this is an empty
@@ -380,7 +380,7 @@ public class App {
 		});
 	}
 
-	//TODO zur webseite hinzufügen
+	// TODO zur webseite hinzufügen
 	public void posttestmessages() throws UnirestException {
 		JSONObject jo = new JSONObject();
 		jo.put("status", "ALARM");
@@ -403,7 +403,7 @@ public class App {
 		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
 	}
-	
+
 	public void gettestmessages() throws UnirestException {
 		HttpResponse<JsonNode> jsonResponse = Unirest.get(App.my_IP + "/messages").asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
@@ -453,7 +453,7 @@ public class App {
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
 	}
-	
+
 	public void createAndJoinOrNotJoinGroup() throws UnirestException {
 		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP + "/taverna/groups").asJson();
 		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
@@ -478,7 +478,7 @@ public class App {
 		System.out.println(jsonObj4 + "\n");
 		System.out.println("####################################\n");
 	}
-	
+
 	public void postHirings() throws UnirestException {
 		JSONObject jo = new JSONObject();
 		jo.put("group", "/taverna/groups/1");
@@ -500,7 +500,7 @@ public class App {
 		showQuestsList();
 		System.out.println("-----------------------------------------------------------------------------------");
 		System.out.println("showTaskDetails");
-		System.out.println("-----------------------------------------------------------------------------------");		
+		System.out.println("-----------------------------------------------------------------------------------");
 		ausgabe += "showTaskDetails\n";
 		ausgabe += "-----------------------------------------------------------------------------------------\n";
 		showTaskDetails("1"); // geht noch nicht
