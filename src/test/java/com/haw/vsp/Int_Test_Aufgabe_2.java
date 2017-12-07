@@ -223,27 +223,27 @@ public class Int_Test_Aufgabe_2 {
 		"message": "<something you want to tell the other one>"
 		}
 	 */	
-	@Test
-	public void postElection() throws UnirestException {
-		String callback = App.my_IP+"/callback";
-		JSONObject jo = new JSONObject();
-		jo.put("algorithm", "bully");
-		jo.put("payload", "election");
-		jo.put("user", App.my_IP);
-		jo.put("job", new JSONObject()
-				.put("id", myUsername+"election1")
-				.put("task", "<uri to the task to accomplish>")
-				.put("resource", "<uri or url to resource where actions are required>")
-				.put("method", "<method to take – if already known>")
-				.put("data", "<data to use/post for the task>")
-				.put("callback", callback)
-				.put("message", "msg"));
-		jo.put("message", "msg");
-		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP + "/election").body(jo).asJson();
-		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
-		assertEquals(201, jsonResponse1.getStatus());
-		System.out.println("############postElection#############\n");
-		System.out.println(jsonObj1 + "\n");
-		System.out.println("####################################\n");	
-	}
+//	@Test
+//	public void postElection() throws UnirestException {
+//		String callback = App.my_IP+"/callback";
+//		JSONObject jo = new JSONObject();
+//		jo.put("algorithm", "bully");
+//		jo.put("payload", "election");
+//		jo.put("user", App.my_IP);
+//		jo.put("job", new JSONObject()
+//				.put("id", myUsername+"election1")
+//				.put("task", "<uri to the task to accomplish>")
+//				.put("resource", "<uri or url to resource where actions are required>")
+//				.put("method", "<method to take – if already known>")
+//				.put("data", "<data to use/post for the task>")
+//				.put("callback", callback)
+//				.put("message", "msg"));
+//		jo.put("message", "msg");
+//		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP + "/election").body(jo).asJson();
+//		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
+//		assertEquals(201, jsonResponse1.getStatus());
+//		System.out.println("############postElection#############\n");
+//		System.out.println(jsonObj1 + "\n");
+//		System.out.println("####################################\n");	
+//	}
 }

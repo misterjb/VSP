@@ -1,36 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<span class="auto-style1">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blackboard RPG TEH GAME</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
 <style type="text/css">
-	textarea{
-        font-family:Montserrat;  
-        font-size: 12px;   
-        resize: none;}
-	fieldset{
-    	border: 0;}	
- 	.auto-style1 {
-		font-family: Montserrat;}
+    .bs-example{
+    	margin: 20px;
+    }
 </style>
-    <meta charset="UTF-8">
-    <title>Blackboard RPG TEH GAME</title> 
-    </span>  
-    </head>
+</head>
 <body>
-<span class="auto-style1">
 <h2>Registriere ein neuen Account oder logge dich mit diesem ein.</h2>
-<hr>
-<div style="display:block">
+<div class="bs-example">
     <form action="/login" method="POST">
-    	<label for="txt_username">Username:</label>
-		<input class="form-control" id="txt_username" name="txt_username" placeholder="Username" type="text" value="" />
-		<label for="txt_password">Password:</label>
-		<input class="form-control" id="txt_password" name="txt_password" placeholder="Password" type="password" value="" />
-		<input id="btn_login" name="btn" type="submit" class="btn btn-default" value="Login" />
-		<input id="btn_register" name="btn" type="submit" class="btn btn-default" value="Register" />
+        <div class="form-group">
+            <label for="txt_username">Username</label>
+            <input type="text" class="form-control" id="txt_username" name="txt_username" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input type="password" class="form-control" id="txt_password" name="txt_password" placeholder="Password" required>
+        </div>
+        <input id="btn_login" name="btn" type="submit" class="btn btn-primary" value="Login" />
+		<input id="btn_register" name="btn" type="submit" class="btn btn-primary" value="Register" />    
 	</form>
 </div>
-<p>$!{Ausgabe}</p>
-</span>	
 </body>
-</html>
+</html>                            

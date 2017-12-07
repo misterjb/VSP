@@ -1,114 +1,51 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<span class="auto-style1">
-<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-<title>Blackboard RPG TEH GAME</title>
-<style type="text/css">
-	textarea{
-        font-family:Montserrat;  
-        font-size: 14px;   
-        resize: none;}
-	fieldset{
-    	border: 0;}	
- 	.auto-style1 {
-		font-family: Montserrat;}
-</style>
-<h1>Willkommen am Blackboard</h1>
-<h1>&nbsp;<input onclick="window.location.href='./'"  name="Button1" type="button" value="Back 2 Login/Register" />
-</h1>
-</span>	
-</head> 
+  <title>Blackboard RPG TEH GAME</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
 <body>
-<span class="auto-style1">
-<div style="width: 700px; height: 570px">
-<form method="post" style="width: 700px; height: 570px;"> 
-	<h3>Kreuzen Sie die gewünschten Befehl an:</h3>
-	<fieldset style="width: 571px">
-    <ul>
-      <li style="height: 35px">         
-      <label>
-          <input type="radio" name="Quest" value="questsList" checked="checked"/> 
-		Lists the quests available</label></li>
-      <li style="height: 35px">  
-        <label>
-           <input type="radio" name="Quest" value="deliverableDetails"/>
-           Details about a single deliverable
-       </label>
-        <input name="deliverablesID" id="deliverablesID" type="text" /></li>
-      <li style="height: 35px">  
-        <label>
-          <input type="radio" name="Quest" value="deliveriesList"/>
-          Lists the deliveries</label></li>
-      <li style="height: 35px">  
-        <label>
-          <input type="radio" name="Quest" value="deliveryDetails"/>
-         Details about a single delivery <input name="deliveryID" id="deliveryID" type="text" />
-        </label></li>
-	  <li style="height: 35px">  
-        <label>
-          <input type="radio" name="Quest" value="detailsQuest"/>
-          Shows details about the quest <input name="detailsQuestID" id="detailsQuestID" type="text" />
-        </label>
-      </li>
-      <li style="height: 35px; width: 630px;">  
-        <label>
-          <input type="radio" name="Quest" value="questTaskList"/>
-          Lists the tasks to be fulfilled to solve the quest <input name="tasklistQuestID" id="tasklistQuestID" type="text" />
-        </label>
-      </li>
-      <li style="height: 35px">  
-        <label>
-          <input type="radio" name="Quest" value="taskDetails"/>
-          Details about a single task <input name="detailsTaskID" id="detailsTaskID" type="text" />
-        </label>
-      </li>
-     <li style="height: 35px"> 
-        <label>
-          <input type="radio" name="Quest" value="map"/>
-          Your friendly map, telling you where locations are found</label></li>
- <li style="height: 35px">  
-        <label>
-          <input type="radio" name="Quest" value="mapInfo"/>
-          Information about a location on the map <input name="mapName" id="mapName" type="text" />
- </label></li>
- <li style="height: 35px">  
-        <label>
-          <input type="radio" name="Quest" value="gotoLocation"/>
-         Visit Location <input name="locationName" id="locationName" type="text" />
- </label></li>
- <li style="height: 35px"> 
-        <label>
-          <input type="radio" name="Quest" value="userList"/>
-          The list of users</label></li>
- <li style="height: 35px"> 
-        <label>
-          <input type="radio" name="Quest" value="UserDetails"/>
-          Shows details about a single user <input name="userName" id="userName" type="text" /></label></li>
- <li style="height: 35px"> 
-        <label>
-          <input type="radio" name="Quest" value="allinOne"/>
-          Complete Quest #1</label></li>
-		<li>
-		<input name="Submit1" type="submit" value="Starten" /></li>
-		
-    </ul> 
-    </fieldset>
-</form>		
+<div class="container">
+<h1>ÜBERSCHRIFT</h1>
+  <h3>gewünschten Befehl auswählen</h3>
+    <form method="post">
+    <div class="form-group">
+      <label for="sel2">Befehl auswählen:</label>
+      <select class="form-control" id="Quest">
+        <option>questsList</option>
+        <option>deliverableDetails (Input required)</option>
+        <option>deliveriesList</option>
+        <option>deliveryDetails (Input required)</option>
+        <option>detailsQuest (Input required)</option>
+		<option>questTaskList (Input required)</option>
+		<option>taskDetails(Input required) </option>
+		<option>map</option>
+		<option>mapInfo(Input required) </option>
+		<option>gotoLocation (Input required)</option>
+		<option>userList</option>
+		<option>UserDetails (Input required)</option>
+		<option>allinOne</option>
+      </select>
+      <label for="Input">Input:</label>
+  <input type="text" class="form-control" id="Input">
+  <br>
+  <input id="btn_start" name="btn" type="submit" class="btn btn-primary" value="Start" />
+    </div>
+  </form>
+  </div>
+<div class="container">
+    <form>
+    <div class="form-group">
+      <label for="Textfeld">Textfeld:</label>
+      <textarea class="form-control" rows="10" id="Textfeld">$!{Ausgabe}</textarea>
+    </div>
+  </form>
 </div>
-<div id="Ebene1" style="position: absolute; width: 800px; height: 570px; z-index: 1; left: 725px; top: 134px">
-<textarea id="textarea" name="TextArea1" style="width: 800px; height: 570px" readonly="readonly" cols="20" rows="1">$!{Ausgabe}
-</textarea></div>
-</span>	
-<span class="auto-style1">
-<p>Aufgabe 1.4: Is the map a yellow pages or white pages server, and what is the difference between them?</p>
-<p>White pages: Verzeichnis für Orte: Wir wollen die IP
-<span class="auto-style1">
-vom Ort nachgucken
-</span>
-</p>
-<p>Aufgabe 1.6: Argue if [the tavern] ist rather a white pages or yellow pages service, and which fits the job better</p>
-<p>Yellow pages: Wie ein Telefonbuch: Helden bieten einen bestimmten Service an, es ist also wie im Telefonbuch sortiert;</p>
-</span>
+
 </body>
 </html>
