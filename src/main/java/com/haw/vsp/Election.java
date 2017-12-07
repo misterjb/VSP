@@ -4,10 +4,10 @@ public class Election {
 	String algorithm;
 	String payload;
 	String user;
-	String job;
+	Assignment job;
 	String message;
 
-	public Election(String algorithm, String payload, String user, String job, String message) {
+	public Election(String algorithm, String payload, String user, Assignment job, String message) {
 		this.algorithm = algorithm;
 		this.payload = payload;
 		this.user = user;
@@ -19,7 +19,7 @@ public class Election {
 		return algorithm;
 	}
 
-	public String getJob() {
+	public Assignment getJob() {
 		return job;
 	}
 
@@ -39,7 +39,7 @@ public class Election {
 		this.algorithm = algorithm;
 	}
 
-	public void setJob(String job) {
+	public void setJob(Assignment job) {
 		this.job = job;
 	}
 

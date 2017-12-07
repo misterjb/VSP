@@ -1,6 +1,7 @@
 package com.haw.vsp;
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.put;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -68,13 +69,31 @@ public class App {
 		 *   assignments.
 		 * • url: a fully qualified url to reach the player service!
 		 */
-		post("/taverna", (request, response) -> {			
+		post("/taverna/user", (request, response) -> {			
 			Registration reg = new Gson().fromJson(request.body(), Registration.class);
+			reg.setId(request.ip());
 			registration_List.add(reg);
 			response.type("application/json");
 			response.status(201);
 			response.body(new Gson().toJson(reg));
 			return response.body();
+		});
+		put("/taverna/user", (request, response) -> {
+			Registration regtemp;
+			for (int i = 0; i < registration_List.size(); i++) {
+				if(registration_List.get(i).getId().equals(request.ip()))
+				{
+					Registration reg = new Gson().fromJson(request.body(), Registration.class);
+					registration_List.get(i).setCapabilities(reg.getCapabilities());
+					response.body(new Gson().toJson(registration_List.get(i)));
+					response.status(200);
+					return response.body();
+				}
+			}
+			response.body(request.body());
+			response.status(409);
+			return response.body();
+			
 		});
 		/*
 		 * {
@@ -100,7 +119,7 @@ public class App {
 			response.status(200);
 			response.body(json.toString());
 			return response.body();
-		});
+		});		
 		post("/hirings", (request, response) -> {
 			Hiring grp = new Gson().fromJson(request.body(), Hiring.class);
 			response.status(201);
@@ -129,13 +148,19 @@ public class App {
 		});
 		get("/messages", (request, response) -> {
 			ausgabe+="\n";
+			JSONObject json = new JSONObject();			 
 			for (int i = 0; i < message_List.size(); i++) {
-				ausgabe+=message_List.get(i)+"\n";
+				ausgabe+=message_List.get(i).getMessage()+"\n";
+				json.put("msg"+i, message_List.get(i).getMessage());
 			}
-			message_List.clear();
-			Map model = new HashMap<>();
-			model.put("Ausgabe", ausgabe);
-			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
+			response.status(201);			
+			response.body(json.toString());
+			return response.body();
+			//TODO zum testen unten wenn im einsatz
+//			message_List.clear();
+//			Map model = new HashMap<>();
+//			model.put("Ausgabe", ausgabe);
+//			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
 		post("/taverna/groups", (request, response) -> {
 			group_List.add(new Group(""+groupanzahl));
@@ -147,8 +172,7 @@ public class App {
 			groupanzahl++;
 			return response.body();
 		});
-		post("/taverna/groups/:id", (request, response) -> {
-			System.out.println(request.body().length());
+		post("/taverna/groups/:id", (request, response) -> {			
 			if(request.body().length()!=0){
 				response.status(406);
 				response.body(request.body());
@@ -165,35 +189,81 @@ public class App {
 				return response.body();
 			}
 		});
-		post("/callback", (request, response) -> {
+		post("/assignments/callback", (request, response) -> {
 			Assignment asgmt = new Gson().fromJson(request.body(), Assignment.class);
 			for (int i = 0; i < group_List.size(); i++) {
 				if(group_List.get(i).getAssignment().getId()==asgmt.getId()){
 					group_List.get(i).getAssignment().updateAssigment(asgmt.getMethod(), asgmt.getData(), asgmt.getUser(), asgmt.getMessage());
 				}
 			}
-			response.status(201);			
+			response.status(201);
+			//TODO results & token zurückgeben
 			response.body(request.body());
 			return response.body();
 		});
-		get("/callback", (request, response) -> {
-			//TODO results & token zurückgeben
-			JSONObject json = new JSONObject();
-			 json.put("results", "results");
-			 json.put("token", "token");
-			response.status(201);			
-			response.body(json.toString());
+		post("/election", (request, response) -> {
+			Election elec = new Gson().fromJson(request.body(), Election.class);
+			String callback =elec.getJob().getCallback();	
+			String user = elec.getUser();
+			JSONObject jo = new JSONObject();
+			jo.put("callback", my_IP+"/callback");
+			jo.put("payload", "ok");
+			
+			//answer: confirm the entrance of an election message
+			HttpResponse<JsonNode> jsonResponse1 = Unirest.post(callback).body(jo).asJson();
+
+			//election
+			HttpResponse<JsonNode> jsonResponse2 = null;
+			Thread.sleep(10);
+			one:
+			for (int i = 0; i < group_List.size(); i++) {
+				for (int j = 0; j<group_List.get(i).getMitglieder_List().size();j++) {
+					if(user.equals(group_List.get(i).getMitglieder_List().get(j))){
+						for (String string : group_List.get(i).getMitglieder_List()) {
+							if(!string.equals(user)){
+								JSONObject jo1 = new JSONObject();
+								jo1.put("callback", my_IP+"election/callback");
+								jo1.put("payload", "election");
+								jsonResponse2 = Unirest.post(string+"/election").body(jo1).asJson();
+							}
+							break one;
+						}
+						
+					}
+				}
+			}
+			Thread.sleep(10);
+			if(jsonResponse2!=null){
+				if (jsonResponse2.getBody().getObject().get("payload").equals("ok")){
+					JSONObject json = new JSONObject();
+					jo.put("message", "got an answer, break the election, wait for the coordinator-message");
+					response.body(json.toString());
+					response.status(200);
+					return response.body();
+				}else{
+					JSONObject json1 = new JSONObject();
+					json1.put("callback", my_IP+"/callback");
+					json1.put("payload", "back to cordinator");
+					HttpResponse<JsonNode> jsonResponse3 = Unirest.post(user+"/callback").body(json1).asJson();
+					response.body(json1.toString());
+					response.status(200);
+					return response.body();
+				}
+			}
+			response.body(request.body());
+			response.status(200);
 			return response.body();
 		});
-		get("/election", (request, response) -> {
-			JSONObject json = new JSONObject();
-			 json.put("results", "results");
-			 json.put("token", "token");
-			response.status(201);			
-			response.body(json.toString());
-			return response.body();
+		post("/callback", (request, response) -> {
+			JSONObject jo = new JSONObject(request.body());
+			if(jo.get("payload").equals("ok")){
+				response.status(200);			
+				return response;
+			}else{
+				response.body(request.body());
+				return response.body();
+			}		
 		});
-		
 
 		
 		
@@ -340,7 +410,11 @@ public class App {
 		});
 	}
 
-	private static void testalles() throws UnirestException {
+	private static void send_coordinator_message() {
+	// TODO Auto-generated method stub
+	
+}
+private static void testalles() throws UnirestException {
 		System.out.println("showQuestsList");
 		System.out.println("-----------------------------------------------------------------------------------");
 		ausgabe += "showQuestsList\n";
