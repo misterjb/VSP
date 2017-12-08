@@ -98,16 +98,6 @@ public class Int_Test_Aufgabe_2 {
 	}
 
 	@Test
-	public void postGroup() throws UnirestException {
-		HttpResponse<JsonNode> jsonResponse = Unirest.post(App.my_IP + "/taverna/groups").asJson();
-		JSONObject jsonObj = jsonResponse.getBody().getObject();
-		assertEquals(201, jsonResponse.getStatus());
-		System.out.println("############postGroup#############\n");
-		System.out.println(jsonObj + "\n");
-		System.out.println("####################################\n");
-	}
-
-	@Test
 	public void createAndJoinOrNotJoinGroup() throws UnirestException {
 		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP + "/taverna/groups").asJson();
 		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
