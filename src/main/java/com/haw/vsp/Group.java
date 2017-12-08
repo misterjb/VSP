@@ -20,7 +20,11 @@ public class Group {
 	}
 	public void addMitglieder(String mitglieder) {
 		mitglieder_List.add(mitglieder);
-	}public ArrayList<String> getMitglieder_List() {
+	}
+	public void removeMitglieder(String mitglieder) {
+		mitglieder_List.remove(mitglieder);
+	}
+	public ArrayList<String> getMitglieder_List() {
 		return mitglieder_List;
 	}
 

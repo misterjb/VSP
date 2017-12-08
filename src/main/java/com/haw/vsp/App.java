@@ -213,37 +213,37 @@ public class App {
 			HttpResponse<JsonNode> jsonResponse1 = Unirest.post(callback).body(new Gson().toJson(elec)).asJson();
 
 			// election
-			HttpResponse<JsonNode> jsonResponse2 = null;
+			ArrayList<HttpResponse<JsonNode>> jsonResponseList = new ArrayList<>();
+			Group tempgrp =null;
 			Thread.sleep(10);
-			one: for (int i = 0; i < group_List.size(); i++) {
+			for (int i = 0; i < group_List.size(); i++) {
 				for (int j = 0; j < group_List.get(i).getMitglieder_List().size(); j++) {
 					if (user.equals(group_List.get(i).getMitglieder_List().get(j))) {
+						tempgrp = group_List.get(i);
 						for (String string : group_List.get(i).getMitglieder_List()) {
 							if (!string.equals(user)) {
 								elec.setPayload("election");
-								jsonResponse2 = Unirest.post(string + "/election").body(new Gson().toJson(elec))
-										.asJson();
+								jsonResponseList.add(Unirest.post(string + "/election").body(new Gson().toJson(elec)).asJson());	
 							}
-							break one;
 						}
-
 					}
 				}
 			}
 			Thread.sleep(10);
-			if (jsonResponse2 != null) {
-				if (jsonResponse2.getBody().getObject().get("payload").equals("ok")) {
+			for (int i = 0; i < jsonResponseList.size(); i++) {
+				if (jsonResponseList.get(i).getBody().getObject().get("payload").equals("ok")) {
 					elec.setMessage("got an answer, break the election, wait for the coordinator-message");
 					response.body(new Gson().toJson(elec).toString());
 					response.status(200);
 					return response.body();
 				} else {
-					elec.setPayload("back to cordinator");
-					HttpResponse<JsonNode> jsonResponse3 = Unirest.post(user + "/callback")
-							.body(new Gson().toJson(elec)).asJson();
-					response.body(new Gson().toJson(elec).toString());
-					response.status(200);
-					return response.body();
+					for (String string : tempgrp.getMitglieder_List()) {
+						if (!string.equals(user)) {
+							elec.setPayload("cordinator");
+							HttpResponse<JsonNode> jsonResponse2 = Unirest.post(string + "/callback").body(new Gson().toJson(elec))
+									.asJson();
+						}
+					}
 				}
 			}
 			response.body(request.body());
