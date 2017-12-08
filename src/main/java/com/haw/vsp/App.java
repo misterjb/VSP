@@ -124,18 +124,14 @@ public class App {
 			return response.body();
 		});
 		get("/hirings", (request, response) -> {
-			ausgabe += "-----------------------------------------------------------------------------------------\n";
 			JSONObject json = new JSONObject();
 			for (int i = 0; i < hiring_List.size(); i++) {
-				ausgabe += new Gson().toJson(hiring_List.get(i)) + "\n";
+				json.put(""+i, new Gson().toJson(hiring_List.get(i)));
 			}
 			hiring_List.clear();
-			 Map model = new HashMap<>();
-			 model.put("Ausgabe", ausgabe);
-			 return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
-//			response.status(201);
-//			response.body(json.toString());
-//			return response.body();
+			response.status(201);
+			response.body(json.toString());
+			return response.body();
 		});
 		post("/assignments", (request, response) -> {
 			Assignment asmnt = new Gson().fromJson(request.body(), Assignment.class);
@@ -158,18 +154,14 @@ public class App {
 			return response.body();
 		});
 		get("/messages", (request, response) -> {
-			ausgabe += "-----------------------------------------------------------------------------------------\n";
-			for (int i = 0; i < message_List.size(); i++) {
-				ausgabe += message_List.get(i).getMessage() + "\n";				
+			JSONObject json = new JSONObject();
+			for (int i = 0; i < message_List.size(); i++) {				
+				json.put(""+i, new Gson().toJson(message_List.get(i).getMessage()));
 			}
 			 message_List.clear();
-			 Map model = new HashMap<>();
-			 model.put("Ausgabe", ausgabe);
-			 return new VelocityTemplateEngine().render(new
-			 ModelAndView(model, "/index.vtl"));
-//			response.status(201);
-//			response.body(json.toString());
-//			return response.body();
+			response.status(201);
+			response.body(json.toString());
+			return response.body();
 		});
 		post("/taverna/groups", (request, response) -> {
 			group_List.add(new Group("" + groupanzahl));
@@ -392,7 +384,7 @@ public class App {
 				posttestmessages();
 				break;
 			case "postHirings":
-				if(!Inputs[3].equals("")){
+				if(Inputs.length==4){
 					postHirings(Inputs[0],Inputs[1],Inputs[2],Inputs[3]);
 				}else{
 					postOwnHirings(Inputs[0],Inputs[1],Inputs[2]);	
@@ -405,14 +397,14 @@ public class App {
 				gethirings();
 				break;	
 			case "postTaverna":
-				if(!Inputs[2].equals("")){
+				if(Inputs.length==3){
 					postTaverna(Inputs[0],Inputs[1],Inputs[2]);
 				}else{
 					postOwnTaverna(Inputs[0],Inputs[1]);
 				}
 				break;
 			case "putTaverna":
-				if(!Inputs[1].equals("")){
+				if(Inputs.length==2){
 					putTaverna(Inputs[0],Inputs[1]);
 				}else{
 					putOwnTaverna(request.queryParams("Input"));
@@ -433,14 +425,14 @@ public class App {
 				}
 				break;	
 			case "notjoinGroup":
-				if(!Inputs[2].equals("")){
+				if(Inputs.length==3){
 					notjoinGroupwithIP(Inputs[0],Inputs[1],Inputs[2]);
 				}else{
 					notjoinGroup(Inputs[0],Inputs[1]);
 				}
 				break;
 			case "joinGroup":
-				if(!Inputs[1].equals("")){
+				if(Inputs.length==2){
 					joinGroupwithIP(Inputs[0],Inputs[1]);
 				}else{
 					joinGroup(Inputs[0]);
@@ -478,18 +470,25 @@ public class App {
 	}
 
 	public static void gettestmessages() throws UnirestException {
-		HttpResponse<JsonNode> jsonResponse = Unirest.get(App.my_IP + "/messages").asJson();
+		HttpResponse<JsonNode> jsonResponse =Unirest.get(App.my_IP + "/messages").asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
 		System.out.println("############gettestmessages#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
+		ausgabe +="############gettestmessages#############\n";
+		ausgabe +=jsonObj+ "\n";
+		ausgabe +="########################################\n";
 	}
+	
 	public static void gethirings() throws UnirestException {
 		HttpResponse<JsonNode> jsonResponse = Unirest.get(App.my_IP + "/hirings").asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
 		System.out.println("############gethirings#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
+		ausgabe +="############gethirings#############\n";
+		ausgabe +=jsonObj+ "\n";
+		ausgabe +="########################################\n";
 	}
 
 	public static void postTaverna(String heroclasse,String capabilities,String IP) throws UnirestException {
@@ -503,8 +502,8 @@ public class App {
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
 		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +=jsonObj+ "\n";
+		ausgabe +="########################################\n";
 	}
 	public static void putTaverna(String capabilities,String IP) throws UnirestException{
 		JSONObject jo1 = new JSONObject();
@@ -516,9 +515,9 @@ public class App {
 		System.out.println("############putTaverna#############\n");
 		System.out.println(jsonObj2 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj2;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############putTaverna#############\n";
+		ausgabe +=jsonObj2+ "\n";
+		ausgabe +="########################################\n";
 	}
 	public static void postOwnTaverna(String heroclasse,String capabilities) throws UnirestException {
 		JSONObject jo = new JSONObject();
@@ -530,9 +529,9 @@ public class App {
 		System.out.println("############postOwnTaverna#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############postOwnTaverna#############\n";
+		ausgabe +=jsonObj+ "\n";
+		ausgabe +="########################################\n";
 	}
 	public static void putOwnTaverna(String capabilities) throws UnirestException{
 		JSONObject jo1 = new JSONObject();
@@ -544,9 +543,9 @@ public class App {
 		System.out.println("############putOwnTaverna#############\n");
 		System.out.println(jsonObj2 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj2;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############putOwnTaverna#############\n";
+		ausgabe +=jsonObj2+ "\n";
+		ausgabe +="########################################\n";
 	}
 
 	public static void getTaverna(String IP) throws UnirestException {
@@ -555,9 +554,9 @@ public class App {
 		System.out.println("############getTaverna#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############getTaverna#############\n";
+		ausgabe +=jsonObj+ "\n";
+		ausgabe +="########################################\n";
 	}
 	
 	public static void getOwnTaverna() throws UnirestException {
@@ -566,9 +565,9 @@ public class App {
 		System.out.println("############getOwnTaverna#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############getOwnTaverna#############\n";
+		ausgabe +=jsonObj+ "\n";
+		ausgabe +="########################################\n";
 	}
 
 	public static void createGroupwithIP(String IP) throws UnirestException {
@@ -577,9 +576,9 @@ public class App {
 		System.out.println("############createGroupwithIP#############\n");
 		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj1;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############createGroupwithIP#############\n";
+		ausgabe +=jsonObj1+ "\n";
+		ausgabe +="########################################\n";
 	}
 	
 	public static void notjoinGroupwithIP(String groupnr,String message,String IP) throws UnirestException{
@@ -590,9 +589,9 @@ public class App {
 		System.out.println("############notjoinGroupwithIP#############\n");
 		System.out.println(jsonObj3 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj3;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############notjoinGroupwithIP#############\n";
+		ausgabe +=jsonObj3+ "\n";
+		ausgabe +="########################################\n";
 	}
 	
 	public static void joinGroupwithIP(String groupnr,String IP) throws UnirestException{
@@ -601,9 +600,9 @@ public class App {
 		System.out.println("############joinGroupwithIP#############\n");
 		System.out.println(jsonObj4 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj4;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############joinGroupwithIP#############\n";
+		ausgabe +=jsonObj4+ "\n";
+		ausgabe +="########################################\n";
 	}
 
 	public static void createGroup() throws UnirestException {
@@ -612,9 +611,9 @@ public class App {
 		System.out.println("############createGroup#############\n");
 		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj1;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############createGroup#############\n";
+		ausgabe +=jsonObj1+ "\n";
+		ausgabe +="########################################\n";
 	}
 	
 	public static void notjoinGroup(String groupnr,String message) throws UnirestException{
@@ -625,9 +624,9 @@ public class App {
 		System.out.println("############notjoinGroup#############\n");
 		System.out.println(jsonObj3 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj3;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############notjoinGroup#############\n";
+		ausgabe +=jsonObj3+ "\n";
+		ausgabe +="########################################\n";
 	}
 	
 	public static void joinGroup(String groupnr) throws UnirestException{
@@ -636,9 +635,9 @@ public class App {
 		System.out.println("############joinGroup#############\n");
 		System.out.println(jsonObj4 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj4;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############joinGroup#############\n";
+		ausgabe +=jsonObj4+ "\n";
+		ausgabe +="########################################\n";
 	}
 
 	public static void postHirings(String groupuri,String questbeschreibung,String message,String IP) throws UnirestException {
@@ -651,9 +650,9 @@ public class App {
 		System.out.println("############postHirings#############\n");
 		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj1;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############postHirings#############\n";
+		ausgabe +=jsonObj1+ "\n";
+		ausgabe +="########################################\n";
 	}
 
 	public static void postOwnHirings(String groupuri,String questbeschreibung,String message) throws UnirestException {
@@ -666,9 +665,9 @@ public class App {
 		System.out.println("############postOwnHirings#############\n");
 		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
-		ausgabe +=jsonObj1;
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############postOwnHirings#############\n";
+		ausgabe +=jsonObj1+ "\n";
+		ausgabe +="########################################\n";
 	}
 	
 	private static void testalles() throws UnirestException {
