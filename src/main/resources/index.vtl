@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <title>Blackboard RPG TEH GAME</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -11,28 +11,28 @@
 </head>
 <body>
 <div class="container">
-<h1>‹BERSCHRIFT</h1>
-  <h3>gew¸nschten Befehl ausw‰hlen</h3>
+<h1>√úBERSCHRIFT</h1>
+  <h3>gew√ºnschten Befehl ausw√§hlen</h3>
     <form method="post">
     <div class="form-group">
-      <label for="sel2">Befehl ausw‰hlen:</label>
+      <label for="sel2">Befehl ausw√§hlen:</label>
       <select class="form-control" id="Quest" name="Quest">
-        <option>questsList</option>
-        <option>deliverableDetails (Input required)</option>
-        <option>deliveriesList</option>
-        <option>deliveryDetails (Input required)</option>
-        <option>detailsQuest (Input required)</option>
-		<option>questTaskList (Input required)</option>
-		<option>taskDetails(Input required) </option>
-		<option>map</option>
-		<option>mapInfo(Input required) </option>
-		<option>gotoLocation (Input required)</option>
-		<option>userList</option>
-		<option>UserDetails (Input required)</option>
-		<option>allinOne</option>
+        <option value="questsList">Lists the quests available</option>
+        <option value="deliverableDetails">Details about a single deliverable (Input required)</option>
+        <option value="deliveriesList">Lists the deliveries</option>
+        <option value="deliveryDetails">Details about a single delivery (Input required)</option>
+        <option value="detailsQuest">Shows details about the quest (Input required)</option>
+		<option value="questTaskList">Lists the tasks to be fulfilled to solve the quest (Input required)</option>
+		<option value="taskDetails">Details about a single task(Input required) </option>
+		<option value="map">Your friendly map, telling you where locations are found</option>
+		<option value="mapInfo">Information about a location on the map(Input required) </option>
+		<option value="gotoLocation">Visit Location (Input required)</option>
+		<option value="userList">The list of users</option>
+		<option value="UserDetails">Shows details about a single user (Input required)</option>
+		<option value="allinOne">Complete Quest #1</option>
       </select>
       <label for="Input">Input:</label>
-  <input type="text" class="form-control" id="Input">
+  <input type="text" class="form-control" id="Input"name="Input">
   <br>
   <input id="btn_start" name="btn" type="submit" class="btn btn-primary" value="Start" />
     </div>

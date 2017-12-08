@@ -374,6 +374,8 @@ public class App {
 				completeQuestOne();
 				break;
 			}
+			System.out.println("Questparameter:"+request.queryParams("Quest"));
+			System.out.println("Inputparameter:"+request.queryParams("Input"));
 			Map model = new HashMap<>();
 			model.put("Ausgabe", ausgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
