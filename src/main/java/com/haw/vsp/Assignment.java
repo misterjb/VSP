@@ -9,6 +9,7 @@ public class Assignment {
 	String callback;
 	String message;
 	String user;
+	String token;
 
 	public Assignment(String id, String task, String resource, String method, String data, String callback,
 			String message) {
@@ -84,5 +85,10 @@ public class Assignment {
 
 	public void setTask(String task) {
 		this.task = task;
+	}
+	public String getToken() {
+		return token;
+	}public void setToken(String token) {
+		this.token = token;
 	}
 }

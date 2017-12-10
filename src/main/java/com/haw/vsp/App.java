@@ -33,12 +33,9 @@ import spark.template.velocity.VelocityTemplateEngine;
 public class App {
 	private static String ausgabe = "";
 	private static String blackboard_IP = "", blackboard_Port = "";
-	private static String locationName = "";
-	private static String locationHost = "";
 	private static String authenticationToken = "";
 	private static HashMap<String, String> locationMap = new HashMap<>();
 	private static String loginFehlerAusgabe = "";
-	private static Object locationToken;
 	public static String my_IP;
 	private static int my_PORT = 4567;
 	private static String my_Group = "11";
@@ -399,7 +396,7 @@ public class App {
 				showUserDetails(param);
 				break;
 			case "gotoLocation":
-				gotoLocation(param);
+				gotoLocation(Inputs[0],Inputs[1]);
 				break;
 			case "allinOne":
 				completeQuestOne();
@@ -482,6 +479,9 @@ public class App {
 			case "postmessage":
 				postmessage(Inputs[0],Inputs[1],Inputs[2],Inputs[3]);
 				break;
+			case "Question":
+				showquestions();
+				break;
 			}
 			System.out.println("Questparameter:"+request.queryParams("Quest"));
 			System.out.println("Inputparameter:"+request.queryParams("Input"));
@@ -489,6 +489,14 @@ public class App {
 			model.put("Ausgabe", ausgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
+	}
+
+	private static void showquestions() {
+		ausgabe += "• Player/Heroservice – Blackboard = Blackboard\n";
+		ausgabe += "• Everyone – Blackboard (discovery) = Broadcast\n";
+		ausgabe += "• Player/Heroservice – Player/Heroservice = Peer-to-Peer\n";
+		ausgabe += "• Player/Heroservice – Location = Token-Ring\n";
+		ausgabe += "• Quest giver – Player =  Client-Server\n";
 	}
 
 	private static void resetAusgabe() {
@@ -997,21 +1005,6 @@ public class App {
 
 	private static void completeQuestOne() throws UnirestException {
 		testalles();
-	}
-
-	// gotoLocation LocationName=name Visit Location host/visits
-	private static void gotoLocation(String name) throws UnirestException {
-		// search for name and take the host of it
-		if (locationMap.containsKey(name)) {
-			HttpResponse<JsonNode> questResponse = Unirest.post("http://" + locationMap.get(name) + "/visits")
-					.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken)
-					.asJson();
-			ausgabe += questResponse.getBody().toString() + "/n";
-			System.out.println(questResponse.getBody().toString());
-			locationToken = questResponse.getBody().getObject().get("token");
-		} else {
-			System.out.println("Map does not contain: " + name);
-		}
 	}
 
 	// gotoLocation LocationName=name Visit Location host/visits
