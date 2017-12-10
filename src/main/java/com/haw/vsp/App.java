@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
@@ -36,7 +37,6 @@ public class App {
 	private static String locationHost = "";
 	private static String authenticationToken = "";
 	private static HashMap<String, String> locationMap = new HashMap<>();
-	private static ArrayList<String> questList = new ArrayList<>();
 	private static String loginFehlerAusgabe = "";
 	private static Object locationToken;
 	public static String my_IP;
@@ -47,6 +47,9 @@ public class App {
 	private static int groupanzahl = 1;
 	private static ArrayList<Group> group_List = new ArrayList<>();
 	private static ArrayList<Hiring> hiring_List = new ArrayList<>();
+	//private static String my_IP = "172.19.0.7";
+	private static HashMap<String,String> questList = new HashMap<>();
+	private static HashMap<Object,Object> tokenMap = new HashMap<>();
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
@@ -359,6 +362,9 @@ public class App {
 				param= request.queryParams("Input");
 			}
 			switch (request.queryParams("Quest")) {
+			case "reset":
+				resetAusgabe();
+				break;
 			case "deliverableDetails":
 				showDeliverableDetails(param);
 				break;
@@ -397,6 +403,9 @@ public class App {
 				break;
 			case "allinOne":
 				completeQuestOne();
+				break;
+			case "allinOne2":
+				completeQuestTwo();
 				break;
 			case "posttestmessages":
 				posttestmessages();
@@ -480,6 +489,10 @@ public class App {
 			model.put("Ausgabe", ausgabe);
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
+	}
+
+	private static void resetAusgabe() {
+		ausgabe = "";
 	}
 
 	private static void postmessage(String status, String type,String message,String IP) throws UnirestException {
@@ -701,47 +714,254 @@ public class App {
 	}
 
 	private static void testalles() throws UnirestException {
-		System.out.println("showQuestsList");
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "showQuestsList\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
+		ausgabe = "";
+
+		/*System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("Login\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "Login\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		login("jannikb","jannikb");*/
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showQuestList\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "showQuestList\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
 		showQuestsList();
-		System.out.println("-----------------------------------------------------------------------------------");
-		System.out.println("showTaskDetails");
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "showTaskDetails\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
-		showTaskDetails("1"); // geht noch nicht
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "showTaskDetails1\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
-		System.out.println("showMap");
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "showMap\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
-		showMap(); // besseres parsen von name, host
-		System.out.println("-----------------------------------------------------------------------------------");
-		System.out.println("showMapInfo");
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "showMapInfo\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showTaskDetails\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "showTaskDetails\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		showTaskDetails("1");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showMap\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "showMap\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		showMap();
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showMapInfo Throneroom\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "showMapInfo Throneroom\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
 		showMapInfo("Throneroom");
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "showMapInfo Throneroom\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
-		System.out.println("gotoLocation");
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "gotoLocation\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
-		gotoLocation("Throneroom");
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "gotoThroneroom\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
-		System.out.println("deliver");
-		System.out.println("-----------------------------------------------------------------------------------");
-		ausgabe += "deliver\n";
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
-		deliver("1"); // geht noch nicht
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("gotoThroneroom\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "gotoThroneroom\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		gotoLocation("visits","Throneroom");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("deliver\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "deliver\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		deliver("","1");
+	}
+
+	private static void completeQuestTwo() throws UnirestException {
+		testalles2();
+	}
+
+	private static void testalles2() throws UnirestException {
+		ausgabe = "";
+
+		/*System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("Login\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="Login\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		login("jannikb","jannikb");*/
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showTaskDetails\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "showTaskDetails\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		showTaskDetails("3");
+
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showMap\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showMap\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		showMap();
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showQuests\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showQuestList\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		showQuestsList();
+
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showMapInfo Dungeon\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showMapInfo Dungeon\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		showMapInfo("Dungeon");
+
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="checkDungeon\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("checkDungeon\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		checkLocation("floor_u1", "Dungeon");
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("checkDungeonRats\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="checkDungeonRats\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		checkLocation("floor_u1/rats", "Dungeon");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("checkRat1\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="checkRat1\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		checkLocation("floor_u1/rats/1", "Dungeon");
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("killRat1\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="killRat1\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		kill("/floor_u1/rats/","Dungeon","1");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("checkRat2\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="checkRat2\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		checkLocation("floor_u1/rats/2", "Dungeon");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("killRat2\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="killRat2\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		kill("/floor_u1/rats/","Dungeon","2");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("checkRat3\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="checkRat3\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		checkLocation("floor_u1/rats/3", "Dungeon");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("killRat3\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="killRat3\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		kill("/floor_u1/rats/","Dungeon","3");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("deliverRatsInDungeon\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="deliverRatsInDungeon\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		deliverRatsInDungeon("Dungeon");
+
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("deliverRat\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="deliverRat\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		deliver("Token:Kill rats","1");
 	}
 
 	private static void registerUser(String username, String password) throws UnirestException {
@@ -794,6 +1014,39 @@ public class App {
 		}
 	}
 
+	// gotoLocation LocationName=name Visit Location host/visits
+	private static void gotoLocation(String resource, String name) throws UnirestException {
+		// search for name and take the host of it
+		if (locationMap.containsKey(name)) {
+			HttpResponse<JsonNode> questResponse = Unirest.post("http://" + locationMap.get(name) + "/" + resource)
+					.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken)
+					.asJson();
+			ausgabe+= questResponse.getBody().toString()+"\n";
+			System.out.println(questResponse.getBody().toString());
+			tokenMap.put(questResponse.getBody().getObject().get("token_name"),questResponse.getBody().getObject().get("token"));
+		} else {
+			System.out.println("Map does not contain: " + name);
+		}
+	}
+
+	// gotoLocation LocationName=name Visit Location host/visits
+	private static void checkLocation(String resource, String name) throws UnirestException {
+		// search for name and take the host of it
+		if (locationMap.containsKey(name)) {
+			HttpResponse<JsonNode> locationResponse = Unirest
+					.get("http://" + locationMap.get(name) + "/" + resource)
+					.header("Accept", "application/json")
+					.header("Authorization", "Token " + authenticationToken)
+					.asJson();
+			String locationString = locationResponse.getBody().toString();
+			System.out.println(locationString);
+			ausgabe+= locationResponse.getBody().toString()+"\n";
+			System.out.println(locationResponse.getBody().toString());
+		} else {
+			System.out.println("Map does not contain: " + name);
+		}
+	}
+
 	// UserDetails UserName=name "/users/{name}" Shows details about a single
 	// user
 	private static void showUserDetails(String name) {
@@ -804,8 +1057,18 @@ public class App {
 	// UserList "/users" The list of users
 	private static void showUserList() {
 		// TODO Auto-generated method stub
-
 	}
+
+	private static void kill(String resource, String name,String id) throws UnirestException {
+		HttpResponse<JsonNode> deliverResponse = Unirest
+				.post("http://" + locationMap.get(name) + resource + id)
+				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken)
+				.asJson();
+		System.out.println(deliverResponse.getBody());
+		ausgabe+=deliverResponse.getBody()+"\n";
+		tokenMap.put(deliverResponse.getBody().getObject().get("token_name"),deliverResponse.getBody().getObject().get("token"));
+	}
+
 
 	// MapInfo MapName=name "/map/{name}" Information about a location on the
 	// map
@@ -815,34 +1078,28 @@ public class App {
 		System.out.println(locationResponse.getBody().toString());
 		String locationInfo = locationResponse.getBody().toString();
 		System.out.println("Info of location: " + locationInfo);
-		ausgabe += locationInfo + "/n";
+		ausgabe+=locationInfo+"\n";
 	}
 
 	// Map "/map" Your friendly map, telling you where locations are found
 	private static void showMap() throws UnirestException {
+		locationMap = new HashMap<>();
 		HttpResponse<JsonNode> locationResponse = Unirest
 				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/map").asJson();
 		String locationString = locationResponse.getBody().toString();
 		System.out.println(locationString);
 
-		int i = 0;
-		while (i < 3) { // nicht hinsehen ... wir benutzen keine magic
-						// numbers!!!!!
-			locationHost = locationString.substring(locationString.indexOf("\"host\":\"") + 8,
-					locationString.indexOf("\"", locationString.indexOf("\"host\":\"") + 8));// to
-																								// "
-																								// from
-			locationName = locationString.substring(locationString.indexOf("\"name\":\"") + 8,
-					locationString.indexOf("\"", locationString.indexOf("\"name\":\"") + 8));
 
-			locationMap.put(locationName, locationHost);
+		JSONArray jarr = new JSONArray();
+		jarr = (JSONArray) locationResponse.getBody().getObject().get("objects");
+		System.out.println(jarr);
 
-			int num = locationString.indexOf("\"", locationString.indexOf("\"name\":\"") + 8);
-			String tmp = locationString.substring(num, locationString.length());
-			locationString = tmp;
-			i++;
+		for (Object o:jarr){
+			if(o instanceof JSONObject){
+				locationMap.put(((JSONObject) o).get("name").toString(),((JSONObject) o).get("host").toString());
+			}
 		}
-		ausgabe += Arrays.asList(locationMap) + "/n";
+		ausgabe+=Arrays.asList(locationMap)+"\n";
 		System.out.println(Arrays.asList(locationMap));
 	}
 
@@ -853,31 +1110,25 @@ public class App {
 				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/tasks/" + id)
 				.header("Authorization", "Token " + authenticationToken).asJson();
 		System.out.println(taskResponse.getBody());
-		ausgabe += taskResponse.getBody() + "/n";
+
+
+
+		ausgabe+= taskResponse.getBody()+"\n";
 	}
 
 	// QuestTaskList tasklistQuestID=id "/blackboard/quests/{id}/tasks" Lists
 	// the tasks to be fulfilled to solve the quest
-	private static void showQuestTaskList(String id) {
-		Body questResponse = Unirest
+	private static void showQuestTaskList(String id) throws UnirestException {
+		HttpResponse<JsonNode> questResponse = Unirest
 				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + id + "/tasks")
-				.getBody();
-		String questtaskString = questResponse.toString();
-		String tasks = questtaskString.substring(questtaskString.indexOf("\"tasks\": [") + 1,
-				questtaskString.indexOf("]"));
+				.asJson();
 
-		Pattern pattern = Pattern.compile("[/a-zA-Z0-9]+");
-		Matcher matcher = pattern.matcher(tasks);
-		ArrayList<String> questtaskList = new ArrayList<>();
-		while (matcher.find()) {
-			questtaskList.add(matcher.group());
-		}
-		int i = 1;
-		for (String quest : questtaskList) {
-			System.out.println("Quest " + i + " is: " + quest);
-			i++;
-		}
+		JSONArray jarr = new JSONArray();
+		jarr = (JSONArray) questResponse.getBody().getObject().get("tasks");
+		System.out.println(jarr);
 
+		ausgabe+=Arrays.asList(jarr)+"\n";
+		System.out.println(Arrays.asList(jarr));
 	}
 
 	// detailsQuest detailsQuestID=id "/blackboard/quests/{id}" Shows details
@@ -894,21 +1145,20 @@ public class App {
 	private static void showQuestsList() throws UnirestException {
 		HttpResponse<JsonNode> questResponse = Unirest
 				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests").asJson();
-		String questString = questResponse.getBody().toString();
-		System.out.println(questString);
-		ausgabe += questString + "/n";
-		String tasks = questString.substring(questString.indexOf("\"tasks\": [") + 1, questString.indexOf("]"));
 
-		Pattern pattern = Pattern.compile("[/a-zA-Z0-9]+");
-		Matcher matcher = pattern.matcher(tasks);
-		while (matcher.find()) {
-			questList.add(matcher.group());
+		JSONArray jarr = new JSONArray();
+		jarr = (JSONArray) questResponse.getBody().getObject().get("objects");
+		System.out.println(jarr);
+
+		for (Object o:jarr){
+			if(o instanceof JSONObject){
+				questList.put(((JSONObject) o).get("id").toString(),((JSONObject) o).get("name").toString());
+			}
 		}
-		int i = 1;
-		for (String quest : questList) {
-			System.out.println("Quest " + i + " is: " + quest);
-			i++;
-		}
+
+		System.out.println(questList);
+		ausgabe+=questList+"\n";
+
 	}
 
 	// DetailsDelivery DeliveryID=id"/blackboard/deliveries/{id}" Details about
@@ -932,21 +1182,38 @@ public class App {
 
 	// Deliver DeliverablesID=id "/blackboard/quests/{id}/deliveries"
 	// Details about a single deliverable
-	private static void deliver(String id) throws UnirestException {
+	private static void deliver(String tokenname, String id) throws UnirestException {
 		JSONObject jo = new JSONObject();
-		jo.put("tokens", new JSONObject().put("/blackboard/tasks/1", locationToken));
+		jo.put("tokens", new JSONObject().put("/blackboard/tasks/"+id, tokenMap.get(tokenname)));
 		System.out.println(jo);
 		HttpResponse<JsonNode> deliverResponse = Unirest
 				.post("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + id + "/deliveries")
 				.header("Content-Type", "application/json").header("Authorization", "Token " + authenticationToken)
 				.body(jo).asJson();
 		System.out.println(deliverResponse.getBody());
-		ausgabe += "-----------------------------------------------------------------------------------------\n";
-		ausgabe += deliverResponse.getBody() + "/n";
-		// ausgabe+= deliverResponse.getBody().getObject().
-		// System.out.println(deliverResponse.getBody().getObject().get("message"));
-		// System.out.println(deliverResponse.getBody().toString());
-		// String deliveryInfo = deliverResponse.getBody().toString();
-		// System.out.println("Info: " + deliveryInfo);
+		ausgabe+=deliverResponse.getBody()+"\n";
+	}
+
+
+	// Deliver DeliverablesID=id "/blackboard/quests/{id}/deliveries"
+	// Details about a single deliverable
+	private static void deliverRatsInDungeon(String name) throws UnirestException {
+		JSONObject jo = new JSONObject();
+		JSONArray ja = new JSONArray();
+		ja.put(tokenMap.get("Token:Rat Tail"));
+		ja.put(tokenMap.get("Token:Rat Eye"));
+		ja.put(tokenMap.get("Token:Rat Leg"));
+		jo.put("tokens", ja);
+		//jo.put("tokens", "["+tokenMap.get("Token:Rat Tail")+","+tokenMap.get("Token:Rat Eye")+","+tokenMap.get("Token:Rat Leg")+"]"); //vorher erstellen? und raus parsen
+		System.out.println(jo);
+		HttpResponse<JsonNode> deliverResponse = Unirest
+				.post("http://" + locationMap.get(name) + "/floor_u1/rats")
+				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken)
+				.body(jo).asJson();
+		System.out.println(deliverResponse.getBody());
+
+		tokenMap.put(deliverResponse.getBody().getObject().get("token_name"),deliverResponse.getBody().getObject().get("token"));
+
+		ausgabe+=deliverResponse.getBody()+"\n";
 	}
 }
