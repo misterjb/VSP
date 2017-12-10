@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,8 +36,7 @@ public class App {
 	private static String loginFehlerAusgabe = "";
 	public static String my_IP;
 	private static int my_PORT = 4567;
-	private static String my_Group = "11";
-	private static ArrayList<Registration> registration_List = new ArrayList<>();
+	private static ArrayList<User> user_List = new ArrayList<>();
 	private static ArrayList<Message> message_List = new ArrayList<>();
 	private static int groupanzahl = 1;
 	private static ArrayList<Group> group_List = new ArrayList<>();
@@ -63,28 +60,44 @@ public class App {
 		}
 		System.out.println(my_IP);
 		/*
-		 * • heroclass: describe your trade – you may be creative here •
-		 * capabilities: you have not earned any yet, so this is an empty
-		 * string. But it will become a comma separated list of capabilities you
-		 * have earned through solving assignments. • url: a fully qualified url
-		 * to reach the player service!
+		 * • heroclass:    describe your trade – you may be creative here •
+		 * • capabilities: you have not earned any yet, so this is an empty
+		 *   			   string. But it will become a comma separated list of capabilities you
+		 *                 have earned through solving assignments. 
+		 * • url: a fully qualified url to reach the player service!
 		 */
-		post("/taverna/user", (request, response) -> {
-			Registration reg = new Gson().fromJson(request.body(), Registration.class);
-			reg.setId(request.ip());
-			registration_List.add(reg);
+		post("/taverna", (request, response) -> {
+			User usr = new Gson().fromJson(request.body(), User.class);
+			System.out.println(request.ip());
+			user_List.add(usr);
 			response.type("application/json");
 			response.status(201);
-			response.body(new Gson().toJson(reg));
+			response.body(new Gson().toJson(usr));
 			return response.body();
 		});
-		put("/taverna/user", (request, response) -> {
-			Registration regtemp;
-			for (int i = 0; i < registration_List.size(); i++) {
-				if (registration_List.get(i).getId().equals(request.ip())) {
-					Registration reg = new Gson().fromJson(request.body(), Registration.class);
-					registration_List.get(i).setCapabilities(reg.getCapabilities());
-					response.body(new Gson().toJson(registration_List.get(i)));
+		get("/taverna/user/:id", (request, response) -> {
+			for (int i = 0; i < user_List.size(); i++) {
+				if(user_List.get(i).getUrl().equals(request.params(":id"))){
+					User usr =user_List.get(i);
+					response.type("application/json");
+					response.status(200);
+					response.body(new Gson().toJson(usr));
+					return response.body();
+				}
+			}
+			response.type("application/json");
+			response.status(400);
+			response.body(new Gson().toJson(request.body()));
+			return response.body();
+		});
+		put("/taverna", (request, response) -> {
+			User regtemp;
+			for (int i = 0; i < user_List.size(); i++) {
+				System.out.println(request.ip());
+				if (user_List.get(i).getUrl().equals(request.ip())) {
+					User usr = new Gson().fromJson(request.body(), User.class);
+					user_List.get(i).setCapabilities(usr.getCapabilities());
+					response.body(new Gson().toJson(user_List.get(i)));
 					response.status(200);
 					return response.body();
 				}
@@ -104,10 +117,28 @@ public class App {
 		 * "<uri to which one sends election messages to>" }
 		 */
 		get("/taverna", (request, response) -> {
+			String groupurl ="";
+			String userurl="";
+			for (int i = 0; i < group_List.size(); i++) {
+				if(group_List.get(i).getMitglieder_List().contains(request.ip())){
+					groupurl = my_IP + "/taverna/groups/" + group_List.get(i).getId();
+				}
+			}
+			for (int i = 0; i <user_List.size() ; i++) {
+				if(user_List.get(i).getUrl().equals(request.ip())){
+					userurl = my_IP+"/taverna/user/"+request.ip();
+				}
+			}
+			if(userurl.equals("")){
+				userurl= "not registered yet";
+			}
+			if(groupurl.equals("")){
+				groupurl= "no group";
+			}
 			JSONObject json = new JSONObject();
-			json.put("user", my_IP);
+			json.put("user", userurl);
 			json.put("idle", "false");
-			json.put("group", my_IP + "/taverna/groups/" + my_Group);
+			json.put("group",groupurl );
 			json.put("hirings", "/hirings");
 			json.put("assignments", "/assignments");
 			json.put("messages", "/messages");
@@ -137,14 +168,45 @@ public class App {
 		post("/assignments", (request, response) -> {
 			Assignment asmnt = new Gson().fromJson(request.body(), Assignment.class);
 			for (int i = 0; i < group_List.size(); i++) {
-				for (String string : group_List.get(i).getMitglieder_List()) {
-					if (string.equals(request.ip())) {
-						group_List.get(i).setAssignment(asmnt);
+				for (User usr : group_List.get(i).getMitglieder_List()) {
+					if (usr.getUrl().equals(request.ip())) {
+						group_List.get(i).addAssignment(asmnt);
 					}
 				}
 			}
 			response.status(201);
 			response.body(new Gson().toJson(asmnt));
+			return response.body();
+		});
+		post("/assignments/callback", (request, response) -> {
+			Assignment asgmt = new Gson().fromJson(request.body(), Assignment.class);
+			for (int i = 0; i < group_List.size(); i++) {
+				for (int j = 0; j < group_List.get(i).getAssignment_List().size(); j++) {
+					if(group_List.get(i).getAssignment_List().get(j).getId().equals(asgmt.getId())){
+						group_List.get(i).getAssignment_List().get(j).updateAssigment(asgmt.getMethod(), asgmt.getData(), asgmt.getUser(), asgmt.getMessage());
+						response.status(201);
+						response.body(request.body());
+						return response.body();
+					}
+				}
+			}
+			response.status(400);
+			response.body(request.body());
+			return response.body();
+			
+		});
+		get("/assignments", (request, response) -> {
+			JSONObject json = new JSONObject();
+			for (int i = 0; i < group_List.size(); i++) {
+				for (User usr : group_List.get(i).getMitglieder_List()) {
+					if (usr.getUrl().equals(request.ip())) {
+						JSONArray jsArray = new JSONArray(group_List.get(i).getAssignment_List());					       
+						json.put("Assigments",jsArray);
+					}
+				}
+			}
+			response.status(201);
+			response.body(new Gson().toJson(json));
 			return response.body();
 		});
 		post("/messages", (request, response) -> {
@@ -159,7 +221,7 @@ public class App {
 			for (int i = 0; i < message_List.size(); i++) {				
 				json.put(""+i, new Gson().toJson(message_List.get(i).getMessage()));
 			}
-			 message_List.clear();
+			message_List.clear();
 			response.status(201);
 			response.body(json.toString());
 			return response.body();
@@ -176,7 +238,7 @@ public class App {
 		});
 		get("/taverna/groups/:id", (request, response) -> {
 			for (int i = 0; i < group_List.size(); i++) {
-				if(group_List.get(i).getId()==request.params(":id")){
+				if(group_List.get(i).getId().equals(request.params(":id"))){
 					Group temp =group_List.get(i);
 					response.body(new Gson().toJson(temp));
 					response.status(200);
@@ -196,27 +258,22 @@ public class App {
 				int grpnr = Integer.parseInt(request.params(":id"));
 				Group grp = group_List.get(grpnr - 1);
 				JSONObject json = new JSONObject();
-				json.put("msg", "Gruppe begetreten");
+				json.put("msg", "Gruppe beigetreten");
 				json.put("groupnr", grp.getId());
-				grp.addMitglieder(request.ip());
-				response.status(202);
-				response.body(json.toString());
-				return response.body();
-			}
-		});
-		post("/assignments/callback", (request, response) -> {
-			Assignment asgmt = new Gson().fromJson(request.body(), Assignment.class);
-			for (int i = 0; i < group_List.size(); i++) {
-				if (group_List.get(i).getAssignment().getId() == asgmt.getId()) {
-					group_List.get(i).getAssignment().updateAssigment(asgmt.getMethod(), asgmt.getData(),
-							asgmt.getUser(), asgmt.getMessage());
+				for (int i = 0; i < user_List.size(); i++) {
+					if(user_List.get(i).getUrl().equals(request.ip())){
+						grp.addMitglied(user_List.get(i));
+						response.status(202);
+						response.body(json.toString());
+						return response.body();
+					}
 				}
+				response.status(400);
+				response.body(request.body());
+				return response.body();
+				
 			}
-			response.status(201);
-			// TODO results & token zurückgeben
-			response.body(request.body());
-			return response.body();
-		});
+		});		
 		post("/election", (request, response) -> {
 			Election elec = new Gson().fromJson(request.body(), Election.class);
 			String callback = elec.getJob().getCallback();
@@ -234,11 +291,11 @@ public class App {
 				for (int j = 0; j < group_List.get(i).getMitglieder_List().size(); j++) {
 					if (user.equals(group_List.get(i).getMitglieder_List().get(j))) {
 						tempgrp = group_List.get(i);
-						for (String string : group_List.get(i).getMitglieder_List()) {
-							if (!string.equals(user)) {
+						for (User usr : group_List.get(i).getMitglieder_List()) {
+							if (!usr.getUrl().equals(user)) {
 								elec.setPayload("election");
-								jsonResponseList.add(Unirest.post(string + "/election").body(new Gson().toJson(elec)).asJson());
-								System.out.println("election an"+string +"geschickt");
+								jsonResponseList.add(Unirest.post(usr + "/election").body(new Gson().toJson(elec)).asJson());
+								System.out.println("election an"+usr +"geschickt");
 							}
 						}
 					}
@@ -252,10 +309,10 @@ public class App {
 					response.status(200);
 					return response.body();
 				} else {
-					for (String string : tempgrp.getMitglieder_List()) {
-						if (!string.equals(user)) {
+					for (User usr : tempgrp.getMitglieder_List()) {
+						if (!usr.getUrl().equals(user)) {
 							elec.setPayload("cordinator");
-							HttpResponse<JsonNode> jsonResponse2 = Unirest.post(string + "/callback").body(new Gson().toJson(elec))
+							HttpResponse<JsonNode> jsonResponse2 = Unirest.post(usr.getUrl() + "/callback").body(new Gson().toJson(elec))
 									.asJson();
 						}
 					}
@@ -482,6 +539,9 @@ public class App {
 			case "Question":
 				showquestions();
 				break;
+			case "getAssignments":
+				getAssignments();
+				break;
 			}
 			System.out.println("Questparameter:"+request.queryParams("Quest"));
 			System.out.println("Inputparameter:"+request.queryParams("Input"));
@@ -491,6 +551,18 @@ public class App {
 		});
 	}
 
+	private static void getAssignments() throws UnirestException {
+		HttpResponse<JsonNode> jsonResponse1 = Unirest.get(App.my_IP + "/assignments").asJson();
+		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
+		assertEquals(201, jsonResponse1.getStatus());
+		System.out.println("############getAssignments#############\n");
+		System.out.println(jsonObj1 + "\n");
+		System.out.println("####################################\n");
+		ausgabe +="############getAssignments#############\n";
+		ausgabe +=jsonObj1+ "\n";
+		ausgabe +="########################################\n";
+	}
+	
 	private static void showquestions() {
 		ausgabe += "• Player/Heroservice – Blackboard = Blackboard\n";
 		ausgabe += "• Everyone – Blackboard (discovery) = Broadcast\n";
@@ -586,7 +658,7 @@ public class App {
 		jo.put("heroclass", heroclasse);
 		jo.put("capabilities", "");
 		jo.put("url", App.my_IP);
-		HttpResponse<JsonNode> jsonResponse = Unirest.post(IP + "/taverna/user").body(jo).asJson();
+		HttpResponse<JsonNode> jsonResponse = Unirest.post(IP + "/taverna").body(jo).asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
 		System.out.println("############postTaverna#############\n");
 		System.out.println(jsonObj + "\n");
@@ -603,7 +675,7 @@ public class App {
 		jo1.put("heroclass", "heroclasse");
 		jo1.put("capabilities",capabilities);
 		jo1.put("url", App.my_IP);
-		HttpResponse<JsonNode> jsonResponse2 = Unirest.put(IP + "/taverna/user").body(jo1).asJson();
+		HttpResponse<JsonNode> jsonResponse2 = Unirest.put(IP + "/taverna").body(jo1).asJson();
 		JSONObject jsonObj2 = jsonResponse2.getBody().getObject();
 		System.out.println("############putTaverna#############\n");
 		System.out.println(jsonObj2 + "\n");
@@ -1186,7 +1258,6 @@ public class App {
 		System.out.println(deliverResponse.getBody());
 		ausgabe+=deliverResponse.getBody()+"\n";
 	}
-
 
 	// Deliver DeliverablesID=id "/blackboard/quests/{id}/deliveries"
 	// Details about a single deliverable

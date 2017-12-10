@@ -68,8 +68,8 @@ public class Int_Test_Aufgabe_2 {
 		JSONObject jo = new JSONObject();
 		jo.put("heroclass", "heroclasse");
 		jo.put("capabilities", "");
-		jo.put("url", App.my_IP);
-		HttpResponse<JsonNode> jsonResponse = Unirest.post(App.my_IP + "/taverna/user").body(jo).asJson();
+		jo.put("url", "127.0.0.1");
+		HttpResponse<JsonNode> jsonResponse = Unirest.post(App.my_IP + "/taverna").body(jo).asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
 		assertEquals(201, jsonResponse.getStatus());
 		System.out.println("############postTaverna#############\n");
@@ -78,8 +78,8 @@ public class Int_Test_Aufgabe_2 {
 		JSONObject jo1 = new JSONObject();
 		jo1.put("heroclass", "heroclasse");
 		jo1.put("capabilities", "group");
-		jo1.put("url", App.my_IP);
-		HttpResponse<JsonNode> jsonResponse2 = Unirest.put(App.my_IP + "/taverna/user").body(jo1).asJson();
+		jo1.put("url", "127.0.0.1");
+		HttpResponse<JsonNode> jsonResponse2 = Unirest.put(App.my_IP + "/taverna").body(jo1).asJson();
 		JSONObject jsonObj2 = jsonResponse2.getBody().getObject();
 		assertEquals(200, jsonResponse2.getStatus());
 		System.out.println("############postTaverna#############\n");
@@ -164,6 +164,8 @@ public class Int_Test_Aufgabe_2 {
 	 */
 	@Test
 	public void postAssignments() throws UnirestException {
+		postAndputTaverna();
+		createAndJoinOrNotJoinGroup();
 		JSONObject jo = new JSONObject();
 		jo.put("id", myUsername);
 		jo.put("task", "<uri to the task to accomplish>");
@@ -179,6 +181,21 @@ public class Int_Test_Aufgabe_2 {
 		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
 		
+		JSONObject jo1 = new JSONObject();
+		jo1.put("id", myUsername+1);
+		jo1.put("task", "<uri to the task to accomplish>");
+		jo1.put("resource", "<uri or url to resource where actions are required>");
+		jo1.put("method", "<method to take – if already known>");
+		jo1.put("data", "<data to use/post for the task>");
+		jo1.put("callback", "/assignments/callback");
+		jo1.put("message", "msg");
+		HttpResponse<JsonNode> jsonResponse4 = Unirest.post(App.my_IP + "/assignments").body(jo).asJson();
+		JSONObject jsonObj4 = jsonResponse4.getBody().getObject();
+		assertEquals(201, jsonResponse4.getStatus());
+		System.out.println("############postAssignments#############\n");
+		System.out.println(jsonObj4 + "\n");
+		System.out.println("####################################\n");
+		
 		JSONObject jo2 = new JSONObject();
 		jo2.put("id", myUsername);
 		jo2.put("task", "<uri to the task to accomplish>");
@@ -192,6 +209,23 @@ public class Int_Test_Aufgabe_2 {
 		assertEquals(201, jsonResponse2.getStatus());
 		System.out.println("############postCallback#############\n");
 		System.out.println(jsonObj2 + "\n");
+		System.out.println("####################################\n");
+		
+		HttpResponse<JsonNode> jsonResponse3 = Unirest.get(App.my_IP + "/assignments").asJson();
+		JSONObject jsonObj3 = jsonResponse3.getBody().getObject();
+		assertEquals(201, jsonResponse3.getStatus());
+		System.out.println("############getAssignments#############\n");
+		System.out.println(jsonObj3 + "\n");
+		System.out.println("####################################\n");
+		System.out.println(App.my_IP);
+	}
+	
+	public void getAssignments() throws UnirestException {
+		HttpResponse<JsonNode> jsonResponse1 = Unirest.get(App.my_IP + "/assignments").asJson();
+		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
+		assertEquals(201, jsonResponse1.getStatus());
+		System.out.println("############getAssignments#############\n");
+		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
 	}
 	/*
