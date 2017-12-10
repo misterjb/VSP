@@ -66,7 +66,7 @@ public class App {
 		 *                 have earned through solving assignments. 
 		 * • url: a fully qualified url to reach the player service!
 		 */
-		post("/taverna", (request, response) -> {
+		post("/tavern", (request, response) -> {
 			User usr = new Gson().fromJson(request.body(), User.class);
 			System.out.println(request.ip());
 			user_List.add(usr);
@@ -75,7 +75,7 @@ public class App {
 			response.body(new Gson().toJson(usr));
 			return response.body();
 		});
-		get("/taverna/user/:id", (request, response) -> {
+		get("/tavern/users/:id", (request, response) -> {
 			for (int i = 0; i < user_List.size(); i++) {
 				if(user_List.get(i).getUrl().equals(request.params(":id"))){
 					User usr =user_List.get(i);
@@ -90,7 +90,7 @@ public class App {
 			response.body(new Gson().toJson(request.body()));
 			return response.body();
 		});
-		put("/taverna", (request, response) -> {
+		put("/tavern", (request, response) -> {
 			User regtemp;
 			for (int i = 0; i < user_List.size(); i++) {
 				System.out.println(request.ip());
@@ -116,17 +116,17 @@ public class App {
 		 * "<uri to which one may post messages>", "election":
 		 * "<uri to which one sends election messages to>" }
 		 */
-		get("/taverna", (request, response) -> {
+		get("/tavern", (request, response) -> {
 			String groupurl ="";
 			String userurl="";
 			for (int i = 0; i < group_List.size(); i++) {
 				if(group_List.get(i).getMitglieder_List().contains(request.ip())){
-					groupurl = my_IP + "/taverna/groups/" + group_List.get(i).getId();
+					groupurl = my_IP + "/tavern/groups/" + group_List.get(i).getId();
 				}
 			}
 			for (int i = 0; i <user_List.size() ; i++) {
 				if(user_List.get(i).getUrl().equals(request.ip())){
-					userurl = my_IP+"/taverna/user/"+request.ip();
+					userurl = my_IP+"/tavern/users/"+request.ip();
 				}
 			}
 			if(userurl.equals("")){
@@ -226,7 +226,7 @@ public class App {
 			response.body(json.toString());
 			return response.body();
 		});
-		post("/taverna/groups", (request, response) -> {
+		post("/tavern/groups", (request, response) -> {
 			group_List.add(new Group("" + groupanzahl));
 			JSONObject json = new JSONObject();
 			json.put("msg", "Gruppe wurde erstellt");
@@ -236,7 +236,7 @@ public class App {
 			groupanzahl++;
 			return response.body();
 		});
-		get("/taverna/groups/:id", (request, response) -> {
+		get("/tavern/groups/:id", (request, response) -> {
 			for (int i = 0; i < group_List.size(); i++) {
 				if(group_List.get(i).getId().equals(request.params(":id"))){
 					Group temp =group_List.get(i);
@@ -249,7 +249,7 @@ public class App {
 			response.status(400);
 			return response.body();
 		});
-		post("/taverna/groups/:id", (request, response) -> {
+		post("/tavern/groups/:id", (request, response) -> {
 			if (request.body().length() != 0) {
 				response.status(406);
 				response.body(request.body());
@@ -477,25 +477,25 @@ public class App {
 			case "getHirings":
 				gethirings();
 				break;	
-			case "postTaverna":
+			case "postTavern":
 				if(Inputs.length==3){
-					postTaverna(Inputs[0],Inputs[1],Inputs[2]);
+					postTavern(Inputs[0],Inputs[1],Inputs[2]);
 				}else{
-					postTaverna(Inputs[0],Inputs[1],"");
+					postTavern(Inputs[0],Inputs[1],"");
 				}
 				break;
-			case "putTaverna":
+			case "putTavern":
 				if(Inputs.length==2){
-					putTaverna(Inputs[0],Inputs[1]);
+					putTavern(Inputs[0],Inputs[1]);
 				}else{
-					putTaverna(param,"");
+					putTavern(param,"");
 				}
 				break;
-			case "getTaverna":
+			case "getTavern":
 				if(!param.equals("")){
-					getTaverna(param);
+					getTavern(param);
 				}else{
-					getTaverna("");
+					getTavern("");
 				}
 				break;
 			case "createGroup":
@@ -650,7 +650,7 @@ public class App {
 		ausgabe +="########################################\n";
 	}
 
-	private static void postTaverna(String heroclasse,String capabilities,String IP) throws UnirestException {
+	private static void postTavern(String heroclasse,String capabilities,String IP) throws UnirestException {
 		if(IP.equals("")){
 			IP = my_IP;
 		}
@@ -658,16 +658,16 @@ public class App {
 		jo.put("heroclass", heroclasse);
 		jo.put("capabilities", "");
 		jo.put("url", App.my_IP);
-		HttpResponse<JsonNode> jsonResponse = Unirest.post(IP + "/taverna").body(jo).asJson();
+		HttpResponse<JsonNode> jsonResponse = Unirest.post(IP + "/tavern").body(jo).asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
-		System.out.println("############postTaverna#############\n");
+		System.out.println("############postTavern#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############postTaverna#############\n";
+		ausgabe +="############postTavern#############\n";
 		ausgabe +=jsonObj+ "\n";
 		ausgabe +="########################################\n";
 	}
-	private static void putTaverna(String capabilities,String IP) throws UnirestException{
+	private static void putTavern(String capabilities,String IP) throws UnirestException{
 		if(IP.equals("")){
 			IP = my_IP;
 		}
@@ -675,26 +675,26 @@ public class App {
 		jo1.put("heroclass", "heroclasse");
 		jo1.put("capabilities",capabilities);
 		jo1.put("url", App.my_IP);
-		HttpResponse<JsonNode> jsonResponse2 = Unirest.put(IP + "/taverna").body(jo1).asJson();
+		HttpResponse<JsonNode> jsonResponse2 = Unirest.put(IP + "/tavern").body(jo1).asJson();
 		JSONObject jsonObj2 = jsonResponse2.getBody().getObject();
-		System.out.println("############putTaverna#############\n");
+		System.out.println("############putTavern#############\n");
 		System.out.println(jsonObj2 + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############putTaverna#############\n";
+		ausgabe +="############putTavern#############\n";
 		ausgabe +=jsonObj2+ "\n";
 		ausgabe +="########################################\n";
 	}
 
-	private static void getTaverna(String IP) throws UnirestException {
+	private static void getTavern(String IP) throws UnirestException {
 		if(IP.equals("")){
 			IP = my_IP;
 		}
-		HttpResponse<JsonNode> jsonResponse = Unirest.get(IP + "/taverna").asJson();
+		HttpResponse<JsonNode> jsonResponse = Unirest.get(IP + "/tavern").asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
-		System.out.println("############getTaverna#############\n");
+		System.out.println("############getTavern#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
-		ausgabe +="############getTaverna#############\n";
+		ausgabe +="############getTavern#############\n";
 		ausgabe +=jsonObj+ "\n";
 		ausgabe +="########################################\n";
 	}
@@ -703,7 +703,7 @@ public class App {
 		if(IP.equals("")){
 			IP = my_IP;
 		}
-		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(IP + "/taverna/groups").asJson();
+		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(IP + "/tavern/groups").asJson();
 		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
 		System.out.println("############createGroupwithIP#############\n");
 		System.out.println(jsonObj1 + "\n");
@@ -719,7 +719,7 @@ public class App {
 		}
 		JSONObject json = new JSONObject();
 		json.put("message", message);
-		HttpResponse<JsonNode> jsonResponse3 = Unirest.post(IP + "/taverna/groups/"+groupnr).body(json).asJson();
+		HttpResponse<JsonNode> jsonResponse3 = Unirest.post(IP + "/tavern/groups/"+groupnr).body(json).asJson();
 		JSONObject jsonObj3 = jsonResponse3.getBody().getObject();
 		System.out.println("############notjoinGroupwithIP#############\n");
 		System.out.println(jsonObj3 + "\n");
@@ -733,7 +733,7 @@ public class App {
 		if(IP.equals("")){
 			IP = my_IP;
 		}
-		HttpResponse<JsonNode> jsonResponse4 = Unirest.post(IP + "/taverna/groups/"+groupnr).asJson();
+		HttpResponse<JsonNode> jsonResponse4 = Unirest.post(IP + "/tavern/groups/"+groupnr).asJson();
 		JSONObject jsonObj4 = jsonResponse4.getBody().getObject();
 		System.out.println("############joinGroupwithIP#############\n");
 		System.out.println(jsonObj4 + "\n");

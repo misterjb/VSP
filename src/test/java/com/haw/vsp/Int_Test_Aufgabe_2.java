@@ -64,42 +64,42 @@ public class Int_Test_Aufgabe_2 {
 	}
 
 	@Test
-	public void postAndputTaverna() throws UnirestException {
+	public void postAndputtavern() throws UnirestException {
 		JSONObject jo = new JSONObject();
 		jo.put("heroclass", "heroclasse");
 		jo.put("capabilities", "");
 		jo.put("url", "127.0.0.1");
-		HttpResponse<JsonNode> jsonResponse = Unirest.post(App.my_IP + "/taverna").body(jo).asJson();
+		HttpResponse<JsonNode> jsonResponse = Unirest.post(App.my_IP + "/tavern").body(jo).asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
 		assertEquals(201, jsonResponse.getStatus());
-		System.out.println("############postTaverna#############\n");
+		System.out.println("############posttavern#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
 		JSONObject jo1 = new JSONObject();
 		jo1.put("heroclass", "heroclasse");
 		jo1.put("capabilities", "group");
 		jo1.put("url", "127.0.0.1");
-		HttpResponse<JsonNode> jsonResponse2 = Unirest.put(App.my_IP + "/taverna").body(jo1).asJson();
+		HttpResponse<JsonNode> jsonResponse2 = Unirest.put(App.my_IP + "/tavern").body(jo1).asJson();
 		JSONObject jsonObj2 = jsonResponse2.getBody().getObject();
 		assertEquals(200, jsonResponse2.getStatus());
-		System.out.println("############postTaverna#############\n");
+		System.out.println("############posttavern#############\n");
 		System.out.println(jsonObj2 + "\n");
 		System.out.println("####################################\n");
 	}
 
 	@Test
-	public void getTaverna() throws UnirestException {
-		HttpResponse<JsonNode> jsonResponse = Unirest.get(App.my_IP + "/taverna").asJson();
+	public void gettavern() throws UnirestException {
+		HttpResponse<JsonNode> jsonResponse = Unirest.get(App.my_IP + "/tavern").asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
 		assertEquals(200, jsonResponse.getStatus());
-		System.out.println("############getTaverna#############\n");
+		System.out.println("############gettavern#############\n");
 		System.out.println(jsonObj + "\n");
 		System.out.println("####################################\n");
 	}
 
 	@Test
 	public void createAndJoinOrNotJoinGroup() throws UnirestException {
-		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP + "/taverna/groups").asJson();
+		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP + "/tavern/groups").asJson();
 		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
 		assertEquals(201, jsonResponse1.getStatus());
 		System.out.println("############getGroup#############\n");
@@ -108,14 +108,14 @@ public class Int_Test_Aufgabe_2 {
 
 		JSONObject json = new JSONObject();
 		json.put("message", "ausrede123");
-		HttpResponse<JsonNode> jsonResponse3 = Unirest.post(App.my_IP + "/taverna/groups/1").body(json).asJson();
+		HttpResponse<JsonNode> jsonResponse3 = Unirest.post(App.my_IP + "/tavern/groups/1").body(json).asJson();
 		JSONObject jsonObj3 = jsonResponse3.getBody().getObject();
 		assertEquals(406, jsonResponse3.getStatus());
 		System.out.println("############notjoinGroup#############\n");
 		System.out.println(jsonObj3 + "\n");
 		System.out.println("####################################\n");
 
-		HttpResponse<JsonNode> jsonResponse4 = Unirest.post(App.my_IP + "/taverna/groups/1").asJson();
+		HttpResponse<JsonNode> jsonResponse4 = Unirest.post(App.my_IP + "/tavern/groups/1").asJson();
 		JSONObject jsonObj4 = jsonResponse4.getBody().getObject();
 		assertEquals(202, jsonResponse4.getStatus());
 		System.out.println("############joinGroup#############\n");
@@ -124,7 +124,7 @@ public class Int_Test_Aufgabe_2 {
 	}
 
 	/*
-	 * { "group":"<url to the created group at the taverna>", "quest":
+	 * { "group":"<url to the created group at the tavern>", "quest":
 	 * "<the quest which shall be solved with the group>", "message":
 	 * "<something you want to tell the player you invite>" }
 	 */
@@ -132,7 +132,7 @@ public class Int_Test_Aufgabe_2 {
 	@Test
 	public void postHirings() throws UnirestException {
 		JSONObject jo = new JSONObject();
-		jo.put("group", "/taverna/groups/1");
+		jo.put("group", "/tavern/groups/1");
 		jo.put("quest", "quest beschreibung");
 		jo.put("message", "msg");
 		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP + "/hirings").body(jo).asJson();
@@ -164,7 +164,7 @@ public class Int_Test_Aufgabe_2 {
 	 */
 	@Test
 	public void postAssignments() throws UnirestException {
-		postAndputTaverna();
+		postAndputtavern();
 		createAndJoinOrNotJoinGroup();
 		JSONObject jo = new JSONObject();
 		jo.put("id", myUsername);
