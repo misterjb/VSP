@@ -18,8 +18,8 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import spark.Spark;
 
 public class Int_Test_Aufgabe_2 {
-	String myUsername="jannikb";
-	
+	String myUsername = "jannikb";
+
 	@BeforeClass
 	public static void beforeClass() throws UnirestException {
 		App.main(null);
@@ -53,6 +53,7 @@ public class Int_Test_Aufgabe_2 {
 		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
 	}
+
 	@Test
 	public void gettestmessages() throws UnirestException {
 		HttpResponse<JsonNode> jsonResponse = Unirest.get(App.my_IP + "/messages").asJson();
@@ -128,7 +129,7 @@ public class Int_Test_Aufgabe_2 {
 	 * "<the quest which shall be solved with the group>", "message":
 	 * "<something you want to tell the player you invite>" }
 	 */
-	//TODO hirings bis jetzt nur zu mir selbst geschickt
+	// TODO hirings bis jetzt nur zu mir selbst geschickt
 	@Test
 	public void postHirings() throws UnirestException {
 		JSONObject jo = new JSONObject();
@@ -150,17 +151,14 @@ public class Int_Test_Aufgabe_2 {
 	 * "resource":"<uri or url to resource where actions are required>",
 	 * "method":"<method to take – if already known>",
 	 * "data":"<data to use/post for the task>",
-	 * "callback":"<an url where the initiator can be reached with the results/token>",
-	 * "message": "<something you want to tell the other one>" 
-	 * } 
-	 * {
+	 * "callback":"<an url where the initiator can be reached with the results/token>"
+	 * , "message": "<something you want to tell the other one>" } {
 	 * "id":"<the identity chosen by the initiator for the request>",
 	 * "task":"<same as assignment>", "resource":"<same as assignment>",
 	 * "method":"<method used to get this result>",
 	 * "data":"<the whole response data/result of the action>",
 	 * "user":"<uri to the user solved the task (own account at the blackboard)>"
-	 * , "message": "<something you want to tell the other one>" 
-	 * }
+	 * , "message": "<something you want to tell the other one>" }
 	 */
 	@Test
 	public void postAssignments() throws UnirestException {
@@ -180,9 +178,9 @@ public class Int_Test_Aufgabe_2 {
 		System.out.println("############postAssignments#############\n");
 		System.out.println(jsonObj1 + "\n");
 		System.out.println("####################################\n");
-		
+
 		JSONObject jo1 = new JSONObject();
-		jo1.put("id", myUsername+1);
+		jo1.put("id", myUsername + 1);
 		jo1.put("task", "<uri to the task to accomplish>");
 		jo1.put("resource", "<uri or url to resource where actions are required>");
 		jo1.put("method", "<method to take – if already known>");
@@ -195,14 +193,14 @@ public class Int_Test_Aufgabe_2 {
 		System.out.println("############postAssignments#############\n");
 		System.out.println(jsonObj4 + "\n");
 		System.out.println("####################################\n");
-		
+
 		JSONObject jo2 = new JSONObject();
 		jo2.put("id", myUsername);
 		jo2.put("task", "<uri to the task to accomplish>");
 		jo2.put("resource", "<uri or url to resource where actions are required>");
 		jo2.put("method", "<method to take – if already known>");
 		jo2.put("data", "<data to use/post for the task>");
-		jo2.put("user",App.my_IP);
+		jo2.put("user", App.my_IP);
 		jo2.put("message", "msg");
 		HttpResponse<JsonNode> jsonResponse2 = Unirest.post(App.my_IP + "/assignments/callback").body(jo2).asJson();
 		JSONObject jsonObj2 = jsonResponse2.getBody().getObject();
@@ -210,7 +208,7 @@ public class Int_Test_Aufgabe_2 {
 		System.out.println("############postCallback#############\n");
 		System.out.println(jsonObj2 + "\n");
 		System.out.println("####################################\n");
-		
+
 		HttpResponse<JsonNode> jsonResponse3 = Unirest.get(App.my_IP + "/assignments").asJson();
 		JSONObject jsonObj3 = jsonResponse3.getBody().getObject();
 		assertEquals(201, jsonResponse3.getStatus());
@@ -219,7 +217,7 @@ public class Int_Test_Aufgabe_2 {
 		System.out.println("####################################\n");
 		System.out.println(App.my_IP);
 	}
-	
+
 	public void getAssignments() throws UnirestException {
 		HttpResponse<JsonNode> jsonResponse1 = Unirest.get(App.my_IP + "/assignments").asJson();
 		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
@@ -229,45 +227,41 @@ public class Int_Test_Aufgabe_2 {
 		System.out.println("####################################\n");
 	}
 	/*
-	 * {
-		"algorithm":"<name of the algorithm used>",
-		"payload":"<the payload for the current state of the algorithm>",
-		"user":"<uri of the user sending this request>",
-		"job":"<JSON description of the job to do>",
-		"message": "<something you want to tell the other one>"
-		}
-		job json 
-		{
-		"id":"<some identity choosen by the initiator to identify this request>",
-		"task":"<uri to the task to accomplish>",
-		"resource":"<uri or url to resource where actions are required>",
-		"method":"<method to take – if already known>",
-		"data":"<data to use/post for the task>",
-		"callback": "<an url where the initiator can be reached with the results/token>",
-		"message": "<something you want to tell the other one>"
-		}
-	 */	
-//	@Test
-//	public void postElection() throws UnirestException {
-//		String callback = App.my_IP+"/callback";
-//		JSONObject jo = new JSONObject();
-//		jo.put("algorithm", "bully");
-//		jo.put("payload", "election");
-//		jo.put("user", App.my_IP);
-//		jo.put("job", new JSONObject()
-//				.put("id", myUsername+"election1")
-//				.put("task", "<uri to the task to accomplish>")
-//				.put("resource", "<uri or url to resource where actions are required>")
-//				.put("method", "<method to take – if already known>")
-//				.put("data", "<data to use/post for the task>")
-//				.put("callback", callback)
-//				.put("message", "msg"));
-//		jo.put("message", "msg");
-//		HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP + "/election").body(jo).asJson();
-//		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
-//		assertEquals(201, jsonResponse1.getStatus());
-//		System.out.println("############postElection#############\n");
-//		System.out.println(jsonObj1 + "\n");
-//		System.out.println("####################################\n");	
-//	}
+	 * { "algorithm":"<name of the algorithm used>",
+	 * "payload":"<the payload for the current state of the algorithm>",
+	 * "user":"<uri of the user sending this request>",
+	 * "job":"<JSON description of the job to do>", "message":
+	 * "<something you want to tell the other one>" } job json {
+	 * "id":"<some identity choosen by the initiator to identify this request>",
+	 * "task":"<uri to the task to accomplish>",
+	 * "resource":"<uri or url to resource where actions are required>",
+	 * "method":"<method to take – if already known>",
+	 * "data":"<data to use/post for the task>", "callback":
+	 * "<an url where the initiator can be reached with the results/token>",
+	 * "message": "<something you want to tell the other one>" }
+	 */
+	// @Test
+	// public void postElection() throws UnirestException {
+	// String callback = App.my_IP+"/callback";
+	// JSONObject jo = new JSONObject();
+	// jo.put("algorithm", "bully");
+	// jo.put("payload", "election");
+	// jo.put("user", App.my_IP);
+	// jo.put("job", new JSONObject()
+	// .put("id", myUsername+"election1")
+	// .put("task", "<uri to the task to accomplish>")
+	// .put("resource", "<uri or url to resource where actions are required>")
+	// .put("method", "<method to take – if already known>")
+	// .put("data", "<data to use/post for the task>")
+	// .put("callback", callback)
+	// .put("message", "msg"));
+	// jo.put("message", "msg");
+	// HttpResponse<JsonNode> jsonResponse1 = Unirest.post(App.my_IP +
+	// "/election").body(jo).asJson();
+	// JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
+	// assertEquals(201, jsonResponse1.getStatus());
+	// System.out.println("############postElection#############\n");
+	// System.out.println(jsonObj1 + "\n");
+	// System.out.println("####################################\n");
+	// }
 }
