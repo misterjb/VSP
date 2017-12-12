@@ -284,7 +284,7 @@ public class App {
 			electionList = new HashMap<>();
 			Election elec = new Gson().fromJson(request.body(), Election.class);
 			String callback = elec.getJob().getCallback();
-			String user = halfofmy_IP;
+			String myselfuser = halfofmy_IP;
 			elec.setPayload("ok");
 			elec.getJob().setCallback(my_IP + "/callback");
 			// answer: confirm the entrance of an election message
@@ -296,14 +296,14 @@ public class App {
 			Thread.sleep(10);
 			for (int i = 0; i < group_List.size(); i++) {
 				for (int j = 0; j < group_List.get(i).getMitglieder_List().size(); j++) {
-					if (user.equals(group_List.get(i).getMitglieder_List().get(j))) {
+					if (myselfuser.equals(group_List.get(i).getMitglieder_List().get(j))) {
 						tempgrp = group_List.get(i);
 						for (User grpusr : group_List.get(i).getMitglieder_List()) {
-							if (!grpusr.getUrl().equals(user)) {
+							if (!grpusr.getUrl().equals(myselfuser)) {
 								int grpusrurl = Integer.parseInt(grpusr.getUrl().substring(grpusr.getUrl().lastIndexOf('.') + 1,
 										grpusr.getUrl().length()));
-								int userurl = Integer.parseInt(user.substring(user.lastIndexOf('.') + 1,
-										user.length()-5));
+								int userurl = Integer.parseInt(myselfuser.substring(myselfuser.lastIndexOf('.') + 1,
+										myselfuser.length()-5));
 								if(grpusrurl>userurl){
 									electionList.put(grpusr.getUrl().substring(grpusr.getUrl().lastIndexOf('.') + 1,
 											grpusr.getUrl().length()), "");
@@ -328,11 +328,13 @@ public class App {
 				}
 			}
 			if(!anyok){
-				for (Map.Entry<String, String> entry : electionList.entrySet()) {
-					System.out.println("juhu bin neuer cordinator");
-					elec.setPayload("cordinator");
-					HttpResponse<JsonNode> jsonResponse2 = Unirest.post(entry.getKey() + "/callback")
-							.body(new Gson().toJson(elec)).asJson();
+				for (User grpusr : tempgrp.getMitglieder_List()) {
+					if (!grpusr.getUrl().equals(myselfuser)) {
+						System.out.println("juhu bin neuer cordinator");
+						elec.setPayload("cordinator");
+						HttpResponse<JsonNode> jsonResponse2 = Unirest.post(grpusr.getUrl() + "/callback")
+								.body(new Gson().toJson(elec)).asJson();
+					}
 				}
 			}
 			response.body(request.body());
