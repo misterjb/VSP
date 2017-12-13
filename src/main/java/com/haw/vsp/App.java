@@ -889,6 +889,7 @@ public class App {
 
 	private static void completeQuestThree() throws UnirestException {
 		testalles3();
+<<<<<<< HEAD
 	}
 
 	private static void testalles3() throws UnirestException {
@@ -991,6 +992,112 @@ public class App {
 				.body(jo).asJson();*/
 	}
 
+=======
+	}
+
+	private static void testalles3() throws UnirestException {
+		ausgabe = "";
+
+
+		User mage = new User("mage","group",my_IP+ ":" + my_PORT);
+		User warrior = new User("warrior","group",my_IP+ ":" + my_PORT);
+
+		Group group = new Group("1");
+
+		group.addMitglied(mage);
+		group.addMitglied(warrior);
+
+		Assignment ass1 = new Assignment("mage","3","/wounded","/stretcher/handle/front","",my_IP+ ":" + my_PORT,"do the front");
+		Assignment ass2 = new Assignment("warrior","3","/wounded","/stretcher/handle/back","",my_IP+ ":" + my_PORT,"do the back");
+
+		group.addAssignment(ass1);
+		group.addAssignment(ass2);
+
+		testWarrior(ass2);
+		testMage(ass1);
+
+	}
+
+	private static void testWarrior(Assignment ass) throws UnirestException {
+		System.out.println("LoginWarrior\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="LoginWarrior\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		login("LeeroyJenkins","LeeroyJenkins");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showTaskDetails\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+= "showTaskDetails\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		showTaskDetails(ass.getTask());
+
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showMap\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showMap\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		showMap();
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showQuests\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="showQuestList\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		showQuestsList();
+
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="checkWounded\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("checkWounded\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		checkLocation(ass.getResource(), "Throneroom");
+
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("help\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+		ausgabe+="help\n";
+		ausgabe+="-----------------------------------------------------------------------------------\n";
+
+		action(ass.getMethod(),"Throneroom","");
+
+		/*JSONObject jo = new JSONObject();
+		jo.put("id","warrior");
+		jo.put("task",ass.getTask());
+		jo.put("resource",ass.getResource());
+		jo.put("method","post on /wounded/stretcher/handle/back");
+		jo.put("user",user.getUrl());
+		jo.put("message","his feet smell");
+
+		HttpResponse<JsonNode> deliverResponse = Unirest
+				.post("http://" + ass.getCallback() + ass.getResource())
+				.header("Content-Type", "application/json")
+				.body(jo).asJson();*/
+	}
+
+>>>>>>> 3bfa6423501262ca48429da7f27aaab3b09ef257
 	private static void testMage(Assignment ass) throws UnirestException {
 		System.out.println("LoginMage\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
@@ -1012,6 +1119,10 @@ public class App {
 
 		checkLocation(ass.getResource(), "Throneroom");
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3bfa6423501262ca48429da7f27aaab3b09ef257
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("help\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
@@ -1022,6 +1133,10 @@ public class App {
 
 		action(ass.getMethod(),"Throneroom","");
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3bfa6423501262ca48429da7f27aaab3b09ef257
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("deliverWounded\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
@@ -1039,6 +1154,10 @@ public class App {
 
 		deliverQuestInLocation("Throneroom",jo,ass.getResource());
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3bfa6423501262ca48429da7f27aaab3b09ef257
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("deliver\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
