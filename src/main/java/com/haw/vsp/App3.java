@@ -27,7 +27,7 @@ import spark.ModelAndView;
 import spark.Spark;
 import spark.template.velocity.VelocityTemplateEngine;
 
-public class App {
+public class App3 {
 	private static String ausgabe = "";
 	private static String blackboard_IP = "", blackboard_Port = "";
 	private static String authenticationToken = "";
@@ -35,7 +35,7 @@ public class App {
 	private static String loginFehlerAusgabe = "";
 	public static String my_IP;
 	public static String halfofmy_IP;
-	public static int my_PORT = 4567;
+	public static int my_PORT = 4569;
 	private static ArrayList<Message> message_List = new ArrayList<>();
 	private static ArrayList<Hiring> hiring_List = new ArrayList<>();
 	private static ArrayList<Assignment> assignment_List = new ArrayList<>();

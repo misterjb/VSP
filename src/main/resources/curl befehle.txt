@@ -1,0 +1,64 @@
+
+
+curl --user jannikb:jannikb 172.19.0.7:5000/login
+curl --user LeeroyJenkins:LeeroyJenkins 172.19.0.7:5000/login
+
+
+curl 172.19.0.7:5000/taverna/adventurers/jannikb -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJqYW5uaWtiIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZXYUZCd1ZtazJZV016ZG1WQlRFUmphVUkyV1dWUmQwdDZjR05mTURreFprdHhhV00yZUZCZlRYbHlPVzlDTTBoRUxWcHRSV2d4Y0c1aWJWRnlWbTh0ZWpreWRreG5lRE5XTFhGSE5rVk1aWEZFU0dWR1ZEZzVPRmMyWkZKV1JIWjZNMGsxU1ZaSGRHZ3RNbGxEVHkxdlNGQndjVkJIU25WUmFFbHhaWFZVVWpaR1dqWjNMWEZ2YVU5Tk1GcERTa2QzTTFkMlVrcEJPRGwzUFQwPSJ9' 
+
+//Created Adventurer jannikb
+curl -d '{"capabilities":"group, election, bully, mutex","heroclass":"uberraidboss","url":"172.19.0.70:4567"}' -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJqYW5uaWtiIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZXWjJJNGJVeFlNMVZYYURkMWVFaDZPWGh2YmtGQlZVTlNWbEJuUlZwNlkzZHlZa2xGUkRSUldVaEdWMTlFYW5KaFJqVmxPR3MxYWtOeWQyMVJaVTV4UW1oR2IxVkpjRWhUV25OS1dHVk5NMU51VGtOa2JITjFNV0ZaUTI5bFNFNXhla1l0WHpSbFZUVkVNR1ZKWlVaQmFDMVFaUzFIU1hneFoweGpXa1ZSV1VoV1kxQXhTbXRIWmt4Q1dFcHRZbmd4U25CRlZXcDNPWGRSUFQwPSJ9' -X POST 172.19.0.7:5000/taverna/adventurers
+{
+  "message": "Created Adventurer",
+  "object": [
+    {
+      "capabilities": "group, election, bully, mutex",
+      "group": null,
+      "heroclass": "uberraidboss",
+      "url": "172.19.0.70:4567",
+      "user": "/users/jannikb"
+    }
+  ],
+  "status": "success"
+}
+
+//Created Adventurer LeeroyJenkins
+curl -d '{"capabilities":"group, election, bully, mutex","heroclass":"uberraidbossx2","url":"172.19.0.71:4567"}' -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJMZWVyb3lKZW5raW5zIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZXWnpSMlZuQnpXR3hWVDNkeWNuTkxXVTlKTmxkQlJHMTVNM0ExU25CcWFDMVpiWFIyVTNweU5FZEViMVJ1YmxGNWFFeFFRVkZYYTBvd2FubFFSMDFyUmtScFIzTkxORXh3VkVoV2VucHdabWx4UVZoaFZXOXhUVVYzUVVkT0xVZGhVbVowYlhsS2VEUlNNa1ZVT1c5alQwSmxkR1JSV1U1VFEyRmhTREZoUnpGc2RrMURjVE41YlRsSWIydG5jV05FTkdaU1RFMXpjRzVuUFQwPSJ9' -X POST 172.19.0.7:5000/taverna/adventurers
+
+{
+  "message": "Created Adventurer",
+  "object": [
+    {
+      "capabilities": "group, election, bully, mutex",
+      "group": null,
+      "heroclass": "uberraidbossx2",
+      "url": "172.19.0.71:4567",
+      "user": "/users/LeeroyJenkins"
+    }
+  ],
+  "status": "success"
+}
+
+//CREATE GROUP
+curl -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJqYW5uaWtiIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZXWjJJNGJVeFlNMVZYYURkMWVFaDZPWGh2YmtGQlZVTlNWbEJuUlZwNlkzZHlZa2xGUkRSUldVaEdWMTlFYW5KaFJqVmxPR3MxYWtOeWQyMVJaVTV4UW1oR2IxVkpjRWhUV25OS1dHVk5NMU51VGtOa2JITjFNV0ZaUTI5bFNFNXhla1l0WHpSbFZUVkVNR1ZKWlVaQmFDMVFaUzFIU1hneFoweGpXa1ZSV1VoV1kxQXhTbXRIWmt4Q1dFcHRZbmd4U25CRlZXcDNPWGRSUFQwPSJ9' -X POST 172.19.0.7:5000/taverna/groups
+{
+  "message": "Created Group",
+  "object": [
+    {
+      "_links": {
+        "members": "/taverna/groups/1461/members",
+        "self": "/taverna/groups/1461"
+      },
+      "id": 1461,
+      "members": [],
+      "owner": "jannikb"
+    }
+  ],
+  "status": "success"
+}
+
+//JOIN GROUP 1461
+curl -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJMZWVyb3lKZW5raW5zIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZXYUU1RWVtWnVja1I0ZWtkVU1VdFNhRjlxVFVabFIwMUhVWEZRYkdaRlFVOUdUbk40TlZWR2FqaDJZbFZzZDJaR2N6ZHJWVXBLZW1sT2JHWkNVV1JIWTJSdlkycEpjekYxZDI1d1MxSldRMnN3VjJ0MFRubGZNM3ByWjBVd2MwUkpZMmcwZFRsRmFFVnJTMVJyZG00MlNHbDBlRXhNV1Y5TFowbDRhM1pzWkhsb1FsRTJOa3hQTUhsSFpIWXlkR3N0VW14eFRITmpRM2gzUFQwPSJ9' -X POST 172.19.0.7:5000/taverna/groups/1461/members
+
+//SHOW GROUP 1461
+curl 172.19.0.7:5000/taverna/groups/1461/members -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJqYW5uaWtiIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZXYjFsUlpIaExUa2RmUjIxTGEzRlZMVmRmVnpkTWIzZFRjVWR5VVV0WE5tNDVTRzFLZEdzNE5VOVNSRTV4WTNVM1ZuVktWVzFXWXpSWFVFazVTVkJpWjBvMlYzRnVOa3AwT0ZOWlNFNDJlV014T0dSUVpuaG5URXRTV1MxUVdEUjBNbXc1WlhCb09GSm9UbFY1VUVGUU9YUnlkR3RoTUU1eU9WVlVaekEwWjFWTWVtNUNSR0kzTjNoM1ZUZEpaRFpSVlVwNFdFNUxOVzFCUFQwPSJ9'

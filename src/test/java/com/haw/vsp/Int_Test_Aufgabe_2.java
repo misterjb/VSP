@@ -129,7 +129,6 @@ public class Int_Test_Aufgabe_2 {
 	 * "<the quest which shall be solved with the group>", "message":
 	 * "<something you want to tell the player you invite>" }
 	 */
-	// TODO hirings bis jetzt nur zu mir selbst geschickt
 	@Test
 	public void postHirings() throws UnirestException {
 		JSONObject jo = new JSONObject();
