@@ -11,12 +11,12 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class Verbund_Test_Aufgabe3und4 {
-	String IP_1= "http://localhost:4567";
-	String IP_2= "http://localhost:4568";
-	String IP_3= "http://localhost:4569";
+	String IP_1 = "http://localhost:4567";
+	String IP_2 = "http://localhost:4568";
+	String IP_3 = "http://localhost:4569";
 
 	@Test
-	public void posttestmessages() throws UnirestException {	
+	public void posttestmessages() throws UnirestException {
 		JSONObject jo = new JSONObject();
 		jo.put("status", "ALARM");
 		jo.put("type", "WICHTIG");
@@ -47,5 +47,70 @@ public class Verbund_Test_Aufgabe3und4 {
 		System.out.println("############posttestmessages#############\n");
 		System.out.println(jsonObj2 + "\n");
 		System.out.println("####################################\n");
+	}
+	
+//	@Test
+	public void testElection() throws UnirestException{
+		JSONObject jo = new JSONObject();
+		jo.put("algorithm", "bully algo");
+		jo.put("payload", "payload");
+		jo.put("user", App.my_IP);
+		jo.put("job", new JSONObject().put("id", "id").put("task", "task").put("resource", "resource").put("method", "method")
+				.put("data", "data").put("callback", "http://localhost:4567").put("message", "message1"));
+		jo.put("message", "message2");
+		HttpResponse<JsonNode> jsonResponse = Unirest.post("http://localhost:4567" + "/election").body(jo).asJson();
+		JSONObject jsonObj = jsonResponse.getBody().getObject();
+		System.out.println("############postElection#############\n");
+		System.out.println(jsonObj + "\n");
+		System.out.println("####################################\n");
+	}
+	
+	
+//	@Test
+	public void testmutex() throws UnirestException, InterruptedException {
+		JSONObject jsonsetmutex = new JSONObject();
+		jsonsetmutex.put("mutex", "held");
+		HttpResponse<String> response1 = Unirest.post("http://localhost:4568/setmutex").body(jsonsetmutex).asString();
+		System.out.println("http://localhost:4568 " + response1.getBody());
+
+		System.out.println("Client A wants to enter the critical section");
+		JSONObject jsonsetmutex2 = new JSONObject();
+		jsonsetmutex2.put("mutex", "wanting");
+		try {
+			HttpResponse<String> response2 = Unirest.post("http://localhost:4567/setmutex").body(jsonsetmutex2)
+					.asString();
+			System.out.println("http://localhost:4567 " + response2.getBody());
+		} catch (Exception e) {
+			
+		}
+		
+		System.out.println("sleep");
+		Thread.sleep(5000);
+		try {
+			System.out.println("C wants to enter the critical section & sends request to A, B, C");
+			JSONObject jsonsetmutex3 = new JSONObject();
+			jsonsetmutex3.put("mutex", "wanting");
+			HttpResponse<String> response3 = Unirest.post("http://localhost:4569/setmutex").body(jsonsetmutex3)
+					.asString();
+			System.out.println("http://localhost:4569 " + response3.getBody());
+		} catch (Exception e) {
+			
+		}
+		System.out.println("sleep");
+		Thread.sleep(5000);
+		System.out.println("B finishes his critical section");
+		JSONObject jsonsetmutex4 = new JSONObject();
+		jsonsetmutex4.put("mutex", "released");
+		HttpResponse<String> response4 = Unirest.post("http://localhost:4568/setmutex").body(jsonsetmutex4).asString();
+		System.out.println("http://localhost:4568 " + response4.getBody());
+		
+		System.out.println("sleep");
+		Thread.sleep(5000);
+		System.out.println("A has finished his critical section");
+		JSONObject jsonsetmutex5 = new JSONObject();
+		jsonsetmutex5.put("mutex", "released");
+		HttpResponse<String> response5 = Unirest.post("http://localhost:4567/setmutex").body(jsonsetmutex5).asString();
+		System.out.println("http://localhost:4567 " + response5.getBody());
+
 	}
 }

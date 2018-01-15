@@ -34,7 +34,6 @@ public class App2 {
 	private static HashMap<String, String> locationMap = new HashMap<>();
 	private static String loginFehlerAusgabe = "";
 	public static String my_IP;
-	public static String halfofmy_IP;
 	public static int my_PORT = 4568;
 	private static ArrayList<Message> message_List = new ArrayList<>();
 	private static ArrayList<Hiring> hiring_List = new ArrayList<>();
@@ -47,18 +46,18 @@ public class App2 {
 	private static boolean cordinator;
 	private static ArrayList<String> grouplist = new ArrayList<>();
 	private static ArrayList<String> userlist = new ArrayList<>();
+	private static ArrayList<String> userReplylist = new ArrayList<>();
+	private static ArrayList<String> storedUserlist = new ArrayList<>();
 	private static HashMap<String, String> electionMap = new HashMap<>();
-	private static boolean got_reply;
 	private static String mutex_state = "released";
-	private static int logical_time = 0;
+	private static int logical_time;
 
 	@SuppressWarnings("unused")
-	public static void main(String[] args) throws UnirestException {
+	public static void main(String[] args) {
 		Spark.threadPool(20);
 		Spark.port(my_PORT);
 		try {
 			my_IP = InetAddress.getLocalHost().getHostAddress();
-			halfofmy_IP = InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
@@ -74,13 +73,11 @@ public class App2 {
 			userlist.add(IP_1);
 			userlist.add(IP_2);
 			userlist.add(IP_3);
-			
+
 		} else {
 			my_IP = "http://" + my_IP + ":" + my_PORT;
-			login("jannikb", "jannikb");
-			grouplist = getUrlFromOurGroup();
 		}
-		System.out.println(my_IP);
+		System.out.println("IP: " + my_IP);
 		/*
 		 * { "user":"<link to the registered user account>", "idle":<boolean,if
 		 * you have no assignment currently>,
@@ -106,28 +103,41 @@ public class App2 {
 			response.body(json.toString());
 			return response.body();
 		});
-		// def get_reply():
-		// content = request.get_json()
-		// msg = content['msg']
-		// clock_reply = content['time']
-		// if clock_reply > logical_time:
-		// logical_time = clock_reply + 1
-		// else:
-		// logical_time += 1
-		// if msg == 'reply-ok':
-		// got_reply = True
-		// return HTTP_200_OK
+		post("/setmutex", (request, response) -> {
+			JSONObject jo = new JSONObject(request.body());
+			String mutex = jo.get("mutex").toString();
+			System.out.println("mutex:"+mutex);
+			System.out.println("mutex_state:"+mutex_state);
+			if (mutex.equals("wanting")) {
+				mutex_state = mutex;
+				wantToEnterCriticalSection();
+			}else if(mutex_state.equals("held")&&mutex.equals("released")){
+				System.out.println(my_IP+" =released");
+				mutex_state = mutex;
+				replyToStoredUserlist();
+			}else if(mutex.equals("held") && mutex_state.equals("released")){
+				mutex_state = mutex;
+				System.out.println(my_IP+" =held");
+			}
+			JSONObject responsejson = new JSONObject();
+			responsejson.put("status", "Mutex auf " + mutex + " gestellt");
+			response.body(responsejson.toString());
+			response.status(200);
+			return response.body();
+		});
 		post("/reply", (request, response) -> {
 			JSONObject jo = new JSONObject(request.body());
 			String msg = jo.get("msg").toString();
-			int clock_reply =Integer.parseInt(jo.get("msg").toString());
-			if(clock_reply>logical_time){
-				logical_time= clock_reply+1;
-			}else{
-				logical_time+=1;
+			String user = jo.get("user").toString();
+			int clock_reply = Integer.parseInt(jo.get("time").toString());
+			if (clock_reply > logical_time) {
+				logical_time = clock_reply + 1;
+			} else {
+				logical_time += 1;
 			}
-			if(msg.equals("reply-ok")){
-				got_reply = true;
+			if (msg.equals("reply-ok")) {
+				System.out.println(user+" reply ok");
+				userReplylist.add(user);
 			}
 			response.status(200);
 			return response;
@@ -136,38 +146,46 @@ public class App2 {
 			JSONObject jo = new JSONObject(request.body());
 			String reply = jo.get("reply").toString();
 			String usertmp = jo.get("user").toString();
-			int user = Integer.parseInt(usertmp.substring(usertmp.lastIndexOf('.') + 1, usertmp.length()));
-			int myipint = Integer.parseInt(halfofmy_IP.substring(my_IP.lastIndexOf('.') + 1, my_IP.length()));
+			String msg = jo.get("msg").toString();
 			int time = Integer.parseInt(jo.get("time").toString());
+			int user;
+			if (local) {
+				user = Integer.parseInt(usertmp.substring(usertmp.lastIndexOf(':') + 1, usertmp.length()));
+			} else {
+				user = Integer.parseInt(usertmp.substring(usertmp.lastIndexOf('.') + 1, usertmp.lastIndexOf(':')));
+			}
+
+			int myipint;
+			if (local) {
+				myipint = Integer.parseInt(my_IP.substring(my_IP.lastIndexOf(':') + 1, my_IP.length()));
+			} else {
+				myipint = Integer.parseInt(my_IP.substring(my_IP.lastIndexOf('.') + 1, my_IP.lastIndexOf(':')));
+			}
+
 			JSONObject jsonreply_ok = new JSONObject();
 			jsonreply_ok.put("msg", "reply-ok");
 			jsonreply_ok.put("time", logical_time);
 			jsonreply_ok.put("reply", my_IP + "/reply");
 			jsonreply_ok.put("user", my_IP);
-
-			JSONObject jsonrequest = new JSONObject();
-			jsonrequest.put("msg", "request");
-			jsonrequest.put("time", logical_time);
-			jsonrequest.put("reply", my_IP + "/reply");
-			jsonrequest.put("user", my_IP);
-
-			if (mutex_state.equals("held") || (mutex_state.equals("wanting")
-					&& (logical_time > time || (logical_time == time && myipint >= user)))) {
+			System.out.println("logical_time:"+logical_time+" time:"+time);
+			System.out.println("mutex_state:"+mutex_state);
+			if (mutex_state.equals("held") || (
+					mutex_state.equals("wanting") & (logical_time > time || (logical_time == time & myipint >= user)))) {
 				if (mutex_state.equals("wanting")) {
-					get_all_user_names();
-					for (int i = 0; i < userlist.size(); i++) {
-						String tempurl = userlist.get(i);
-						HttpResponse<JsonNode> request_msg = Unirest.post(tempurl + "/mutex").body(jsonrequest)
-								.asJson();
-						HttpResponse<JsonNode> reply_ok_msg = Unirest.post(reply).body(jsonreply_ok).asJson();
-						logical_time += 1;
-					}
+					System.out.println(my_IP + " reply send to: " + reply);
+					HttpResponse<String> response1 = Unirest.post(reply).body(jsonreply_ok).asString();
+					logical_time += 1;
 				} else if (mutex_state.equals("held")) {
-					HttpResponse<JsonNode> reply_ok_msg = Unirest.post(reply).body(jsonreply_ok).asJson();
+					storedUserlist.add(usertmp);
+					System.out.println("request von "+reply+"stored");
+				} else if (usertmp.equals(my_IP)) {
+					System.out.println(my_IP + " reply send to: " + reply);
+					HttpResponse<String> response1 = Unirest.post(reply).body(jsonreply_ok).asString();
 					logical_time += 1;
 				}
 			} else if (mutex_state.equals("released")) {
-				HttpResponse<JsonNode> reply_ok_msg = Unirest.post(reply).body(jsonreply_ok).asJson();
+				System.out.println(my_IP + " is idle and sends reply ok to: " + reply);
+				HttpResponse<String> response1 = Unirest.post(reply).body(jsonreply_ok).asString();
 				logical_time += 1;
 			}
 			response.status(200);
@@ -175,8 +193,8 @@ public class App2 {
 		});
 		get("/mutexstate", (request, response) -> {
 			JSONObject json = new JSONObject();
-			json.put("status", my_IP);
-			json.put("time",logical_time);
+			json.put("state", mutex_state);
+			json.put("time", logical_time);
 			response.type("application/json");
 			response.status(200);
 			response.body(json.toString());
@@ -250,20 +268,16 @@ public class App2 {
 			}
 
 			Election elec = new Gson().fromJson(request.body(), Election.class);
-			String ip = elec.getUser();
 			String callback = elec.getJob().getCallback();
 			elec.setPayload("ok");
-			elec.getJob().setCallback("/callback");
-			if (local) {
-				elec.setUser(my_IP);
-			} else {
-				elec.setUser(halfofmy_IP);
-			}
+			elec.getJob().setCallback(my_IP);
 			// answer: confirm the entrance of an election message
-			System.out.println("confirm the entrance from " + ip);
-			HttpResponse<JsonNode> jsonResponse1 = Unirest.post(ip + callback).body(new Gson().toJson(elec)).asJson();
+			System.out.println("confirm the entrance from " + my_IP);
+			HttpResponse<JsonNode> jsonResponse1 = Unirest.post(callback + "/callback").body(new Gson().toJson(elec))
+					.asJson();
 
 			// election
+			System.out.println("sleep");
 			Thread.sleep(5000);
 			if (cordinator) {
 				response.body(request.body());
@@ -273,48 +287,35 @@ public class App2 {
 			int userurl;
 			if (local) {
 				userurl = Integer.parseInt(my_IP.substring(my_IP.lastIndexOf(':') + 1, my_IP.length()));
-				for (int i = 0; i < grouplist.size(); i++) {
-					String grpusr = grouplist.get(i);
-					if (!grouplist.get(i).equals(my_IP)) {
-						int grpusrurl = Integer.parseInt(grouplist.get(i)
-								.substring(grouplist.get(i).lastIndexOf(':') + 1, grouplist.get(i).length()));
-						if (grpusrurl > userurl) {
-							elec.setPayload("election");
-							System.out.println("meine url: " + userurl + " election geschickt an: " + grpusr);
-							try {
-								electionMap.put(grpusr, "notok");
-								HttpResponse<JsonNode> jsonResponse2 = Unirest.post(grpusr + "/election")
-										.body(new Gson().toJson(elec)).asJson();
-							} catch (Exception e) {
-								System.out.println(grpusr + "NOT FOUND");
-							}
-
-						}
-					}
-				}
-
 			} else {
-				userurl = Integer.parseInt(my_IP.substring(my_IP.lastIndexOf('.') + 1, my_IP.length()));
-				for (int i = 0; i < grouplist.size(); i++) {
-					String grpusr = grouplist.get(i);
-					if (!grouplist.get(i).equals(halfofmy_IP)) {
-						int grpusrurl = Integer.parseInt(grouplist.get(i)
-								.substring(grouplist.get(i).lastIndexOf('.') + 1, grouplist.get(i).length()));
-						if (grpusrurl > userurl) {
-							elec.setPayload("election");
-							System.out.println("meine url: " + userurl + " election geschickt an: " + grpusr);
-							try {
-								electionMap.put(grpusr, "notok");
-								HttpResponse<JsonNode> jsonResponse2 = Unirest.post(grpusr + "/election")
-										.body(new Gson().toJson(elec)).asJson();
-							} catch (Exception e) {
-								System.out.println(grpusr + "NOT FOUND");
-							}
-
+				userurl = Integer.parseInt(my_IP.substring(my_IP.lastIndexOf('.') + 1, my_IP.lastIndexOf(':')));
+			}
+			for (int i = 0; i < grouplist.size(); i++) {
+				String grpusr = grouplist.get(i);
+				if (!grouplist.get(i).equals(my_IP)) {
+					int grpusrurl;
+					if (local) {
+						grpusrurl = Integer.parseInt(grouplist.get(i).substring(grouplist.get(i).lastIndexOf(':') + 1,
+								grouplist.get(i).length()));
+					} else {
+						grpusrurl = Integer.parseInt(grouplist.get(i).substring(grouplist.get(i).lastIndexOf('.') + 1,
+								grouplist.get(i).lastIndexOf(':')));
+					}
+					if (grpusrurl > userurl) {
+						elec.setPayload("election");
+						System.out.println("meine url: " + userurl + " election geschickt an: " + grpusr);
+						try {
+							electionMap.put(grpusr, "notok");
+							HttpResponse<JsonNode> jsonResponse2 = Unirest.post(grpusr + "/election")
+									.body(new Gson().toJson(elec)).asJson();
+						} catch (Exception e) {
+							System.out.println(grpusr + "NOT FOUND");
 						}
+
 					}
 				}
 			}
+			System.out.println("sleep");
 			Thread.sleep(5000);
 			if (cordinator || gotanswer) {
 				response.body(request.body());
@@ -328,23 +329,16 @@ public class App2 {
 					gotanswer = true;
 				}
 			}
-			if (local && !gotanswer && electionMap.size() != 0) {
+			if (!gotanswer && electionMap.size() != 0) {
+				int grpusrurl;
 				for (String grpusr : grouplist) {
-					int grpusrurl = Integer.parseInt(grpusr.substring(grpusr.lastIndexOf(':') + 1, grpusr.length()));
-					if (!grpusr.equals(my_IP)) {
-						if (grpusrurl < userurl) {
-							System.out.println("juhu bin neuer cordinator");
-							elec.setPayload("cordinator");
-							HttpResponse<JsonNode> jsonResponse2 = Unirest.post(grpusr + "/callback")
-									.body(new Gson().toJson(elec)).asJson();
-							cordinator = true;
-						}
+					if (local) {
+						grpusrurl = Integer.parseInt(grpusr.substring(grpusr.lastIndexOf(':') + 1, grpusr.length()));
+					} else {
+						grpusrurl = Integer
+								.parseInt(grpusr.substring(grpusr.lastIndexOf('.') + 1, grpusr.lastIndexOf(':')));
 					}
-				}
-			} else if (!gotanswer && electionMap.size() != 0) {
-				for (String grpusr : grouplist) {
-					int grpusrurl = Integer.parseInt(grpusr.substring(grpusr.lastIndexOf('.') + 1, grpusr.length()));
-					if (!grpusr.equals(halfofmy_IP)) {
+					if (!grpusr.equals(my_IP)) {
 						if (grpusrurl < userurl) {
 							System.out.println("juhu bin neuer cordinator");
 							elec.setPayload("cordinator");
@@ -362,7 +356,7 @@ public class App2 {
 
 		post("/callback", (request, response) -> {
 			Election elec = new Gson().fromJson(request.body(), Election.class);
-			String ip = elec.getUser();
+			String ip = elec.getJob().getCallback();
 			JSONObject jo = new JSONObject(request.body());
 			System.out.println(ip + " callback wird überprüft");
 			if (jo.get("payload").equals("ok")) {
@@ -466,6 +460,11 @@ public class App2 {
 			return new VelocityTemplateEngine().render(new ModelAndView(model, "/index.vtl"));
 		});
 		post("/index", (request, response) -> {
+			if (!local) {
+				login("jannikb", "jannikb");
+				grouplist = getUrlFromOurGroup();
+			}
+			resetvaribles();
 			String[] Inputs = null;
 			String param = "";
 			if (request.queryParams("Input").contains(",")) {
@@ -576,13 +575,80 @@ public class App2 {
 		});
 	}
 
+	private static void replyToStoredUserlist() throws UnirestException {
+		System.out.println("replyToStoredUserlist");
+		JSONObject jsonreply_ok = new JSONObject();
+		jsonreply_ok.put("msg", "reply-ok");
+		jsonreply_ok.put("time", logical_time);
+		jsonreply_ok.put("reply", my_IP + "/reply");
+		jsonreply_ok.put("user", my_IP);
+		for (int i = 0; i < storedUserlist.size(); i++) {
+			System.out.println(my_IP + " storedreply send to: " + storedUserlist.get(i));
+			HttpResponse<String> response1 = Unirest.post(storedUserlist.get(i)).body(jsonreply_ok).asString();
+			logical_time += 1;
+		}
+		storedUserlist = new ArrayList<>();
+	}
+
+	private static void wantToEnterCriticalSection() throws UnirestException, InterruptedException {
+		System.out.println(my_IP+" =wanting");
+		JSONObject jsonrequest = new JSONObject();
+		jsonrequest.put("msg", "request");
+		jsonrequest.put("time", logical_time);
+		jsonrequest.put("reply", my_IP + "/reply");
+		jsonrequest.put("user", my_IP);
+		if (!local) {
+			get_all_user_names();
+		}
+		for (int i = 0; i < userlist.size(); i++) {
+			String tempurl = userlist.get(i);
+			System.out.println("request send to: " + tempurl);
+			try {
+				HttpResponse<String> response1 = Unirest.post(tempurl + "/mutex").body(jsonrequest).asString();
+			} catch (Exception e) {
+				System.out.println(tempurl + " nicht erreicht");
+			}
+			logical_time += 1;
+		}
+		int waittime = 0;
+		while (true) {
+			if(userlist.size() == userReplylist.size() || waittime > 12 || mutex_state.equals("released")){
+				break;
+			}
+			System.out.println("sleep in whileschleife ,userlistsize:"+userlist.size()+",userReplylist:"+userReplylist.size()+",state:"+mutex_state);
+			Thread.sleep(5000);
+			waittime++;
+			for (int i = 0; i < userlist.size(); i++) {
+				String tempurl = userlist.get(i);
+				HttpResponse<JsonNode> jsonresponse1 = Unirest.get(tempurl + "/mutexstate").asJson();
+				String tempmutexstate = jsonresponse1.getBody().getObject().get("state").toString();
+				if (tempmutexstate.equals("released")) {
+					if (!userReplylist.contains(tempurl)) {
+						userReplylist.add(tempurl);
+					}
+				}
+			}
+		}
+		if (userlist.size() == userReplylist.size()) {
+			mutex_state = "held";
+			System.out.println(my_IP+" =held");
+		}
+		userReplylist = new ArrayList<>();
+	}
+
+	private static void resetvaribles() {
+		gotanswer = false;
+		cordinator = false;
+		electionMap = new HashMap<>();
+	}
+
 	private static void get_all_user_names() throws UnirestException {
 		HttpResponse<JsonNode> jsonResponse1 = Unirest
 				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/adventurers")
 				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken).asJson();
 		JSONObject jsonNode1 = jsonResponse1.getBody().getObject();
 		for (int i = 0; i < jsonNode1.getJSONArray("objects").length(); i++) {
-			if(jsonNode1.getJSONArray("objects").getJSONObject(i).get("capabilities").toString().contains("mutex")){
+			if (jsonNode1.getJSONArray("objects").getJSONObject(i).get("capabilities").toString().contains("mutex")) {
 				userlist.add(jsonNode1.getJSONArray("objects").getJSONObject(i).get("url").toString());
 			}
 		}
@@ -599,7 +665,7 @@ public class App2 {
 		jo.put("user", my_IP);
 		System.out.println(my_IP);
 		jo.put("job", new JSONObject().put("id", id).put("task", task).put("resource", resource).put("method", method)
-				.put("data", data).put("callback", "/callback").put("message", message1));
+				.put("data", data).put("callback", IP).put("message", message1));
 		jo.put("message", message2);
 		HttpResponse<JsonNode> jsonResponse = Unirest.post(IP + "/election").body(jo).asJson();
 		JSONObject jsonObj = jsonResponse.getBody().getObject();
@@ -792,7 +858,7 @@ public class App2 {
 		jo.put("method", method);
 		jo.put("data", data);
 		if (callback.equals("yes")) {
-			jo.put("user", App.my_IP);
+			jo.put("user",my_IP);
 		} else {
 			jo.put("callback", "/assignments/callback");
 		}

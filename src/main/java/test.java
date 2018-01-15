@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -36,6 +38,10 @@ public class test {
 		json.put("reply", "reply");
 		json.put("user", "user");
 		System.out.println(json.get("time").toString());
+		
+		String ip ="http://172.19.0.71:4567";
+		int myipint = Integer.parseInt(ip.substring(ip.lastIndexOf('.') + 1, ip.lastIndexOf(':')));
+		System.out.println(myipint);		
 	}
 
 }
