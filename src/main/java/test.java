@@ -6,10 +6,21 @@ import org.json.JSONObject;
 public class test {
 
 	public static void main(String[] args) {
+
+{
+  "object": {
+    "capabilities": "group, election, bully, mutex",
+    "group": 1461,
+    "heroclass": "uberraidbossx",
+    "url": "http://172.19.0.84:4567",
+    "user": "/users/jannikb"
+  }
+}
+
 		JSONObject jo = new JSONObject();
-		jo.put("capabilities", "bully algo");
-		jo.put("group", "payload");
-		jo.put("heroclass", "my_IP");
+		jo.put("capabilities", "group, election, bully, mutex");
+		jo.put("group", "1461");
+		jo.put("heroclass", "uberraidbossx");
 		jo.put("url", "456");
 		jo.put("user", "my_IP");
 		
