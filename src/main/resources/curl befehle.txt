@@ -61,4 +61,25 @@ curl -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZS
 curl -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJMZWVyb3lKZW5raW5zIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZXYUU1RWVtWnVja1I0ZWtkVU1VdFNhRjlxVFVabFIwMUhVWEZRYkdaRlFVOUdUbk40TlZWR2FqaDJZbFZzZDJaR2N6ZHJWVXBLZW1sT2JHWkNVV1JIWTJSdlkycEpjekYxZDI1d1MxSldRMnN3VjJ0MFRubGZNM3ByWjBVd2MwUkpZMmcwZFRsRmFFVnJTMVJyZG00MlNHbDBlRXhNV1Y5TFowbDRhM1pzWkhsb1FsRTJOa3hQTUhsSFpIWXlkR3N0VW14eFRITmpRM2gzUFQwPSJ9' -X POST 172.19.0.7:5000/taverna/groups/1461/members
 
 //SHOW GROUP 1461
-curl 172.19.0.7:5000/taverna/groups/1461/members -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJqYW5uaWtiIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZXYjFsUlpIaExUa2RmUjIxTGEzRlZMVmRmVnpkTWIzZFRjVWR5VVV0WE5tNDVTRzFLZEdzNE5VOVNSRTV4WTNVM1ZuVktWVzFXWXpSWFVFazVTVkJpWjBvMlYzRnVOa3AwT0ZOWlNFNDJlV014T0dSUVpuaG5URXRTV1MxUVdEUjBNbXc1WlhCb09GSm9UbFY1VUVGUU9YUnlkR3RoTUU1eU9WVlVaekEwWjFWTWVtNUNSR0kzTjNoM1ZUZEpaRFpSVlVwNFdFNUxOVzFCUFQwPSJ9'
+curl 172.19.0.7:5000/taverna/groups/1461/members -H "Content-Type: application/json" -H 'Authorization: Token eyJ1c2VybmFtZSI6ICJqYW5uaWtiIiwgImF1dGgiOiAiWjBGQlFVRkJRbUZZYkZsM01IZzVXVXBJTVRGWVEwODNkamRuWlVabFpGa3dSM2xHU1hOd1VFMXBhVmhKT0VjdFdsWmhNVmgwTm1GRlJIUjJPWEp4VldnM2RUbDRORGhIUWt4TlREaHVSbkZuWVZvMlN5MWhXblpFTW0xck1FTTJhRTV6UXpVeVprSllla2h6YUhwelEzSkNaV05LUXpNMlZXeHViblpIWm5SbFdGOUlSbGhVTVRsSlZubDBjR3R0UVhKamR6QkVaM1JsYTNGaU5tRkRVbTVSUFQwPSJ9'
+
+
+{
+  "objects": [
+    {
+      "capabilities": "group, election, bully, mutex",  //APP
+      "group": 1461,
+      "heroclass": "uberraidboss",
+      "url": "http://172.19.0.70:4567",
+      "user": "/users/LeeroyJenkins"
+    },
+    {
+      "capabilities": "group, election, bully, mutex",  //APP2
+      "group": 1461,
+      "heroclass": "uberraidboss",
+      "url": "http://172.19.0.84:4567",
+      "user": "/users/jannikb"
+    }
+  ],
+  "status": "success"
+}

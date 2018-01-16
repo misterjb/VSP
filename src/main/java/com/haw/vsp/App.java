@@ -1502,11 +1502,6 @@ public class App {
 		System.out.println(taskResponse.getBody());
 
 		ausgabe += taskResponse.getBody() + "\n";
-
-		System.out.println(taskResponse.getBody().getObject());
-		System.out.println(taskResponse.getBody().getObject().get("object"));
-		System.out.println(taskResponse.getBody().getObject().get("url"));
-
 		// {"object":{"capabilities":"non","heroclass":"mailbox","user":"/users/jannikb","url":"172.19.0.50:4567","group":1461},"status":"success"}
 	}
 
