@@ -89,7 +89,7 @@ public class App {
 		 */
 		get("/tavern", (request, response) -> {
 			JSONObject json = new JSONObject();
-			json.put("user", "/users/jannikb");
+			json.put("user", "/users/LeeroyJenkins");
 			json.put("idle", "false");
 			json.put("group", "/taverna/groups/1461/members");
 			json.put("hirings", "/hirings");
@@ -469,7 +469,7 @@ public class App {
 		});
 		post("/index", (request, response) -> {
 			if (!local) {
-				login("jannikb", "jannikb");
+				login("LeeroyJenkins", "LeeroyJenkins");
 				grouplist = getUrlFromOurGroup();
 			}
 			resetvaribles();
@@ -891,7 +891,7 @@ public class App {
 			uri = "/assignments";
 		}
 		JSONObject jo = new JSONObject();
-		jo.put("id", "jannikb");
+		jo.put("id", "LeeroyJenkins");
 		jo.put("task", task);
 		jo.put("resource", resource);
 		jo.put("method", method);
