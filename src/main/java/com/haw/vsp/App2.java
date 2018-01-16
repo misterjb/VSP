@@ -1293,7 +1293,7 @@ public class App2 {
 		ausgabe += "postAssignmentsCallback\n";
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
-		postAssignments("3","/wounded","/stretcher/handle/back",tokenMap.get("Token:Bloody Handle back").toString(),"do the back","yes","http://172.19.0.71:4567");
+		postAssignments("3","/wounded","/stretcher/handle/back",tokenMap.get("Token:Bloody Handle back").toString(),"do the back","yes","http://172.19.0.79:4567");
 	}
 
 	private static void signInTaverna(String heroclass, String capabilities, String user, String url) throws UnirestException {

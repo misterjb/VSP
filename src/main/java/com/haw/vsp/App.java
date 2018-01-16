@@ -236,7 +236,6 @@ public class App {
 			for (int i = 0; i < assignment_List.size(); i++) {
 				json.put("" + i, new Gson().toJson(assignment_List.get(i)));
 			}
-			hiring_List.clear();
 			response.status(200);
 			response.body(new Gson().toJson(json));
 			return response.body();
@@ -246,7 +245,6 @@ public class App {
 			for (int i = 0; i < assignmentcallback_List.size(); i++) {
 				json.put("" + i, new Gson().toJson(assignmentcallback_List.get(i)));
 			}
-			hiring_List.clear();
 			response.status(200);
 			response.body(new Gson().toJson(json));
 			return response.body();
@@ -538,7 +536,7 @@ public class App {
 				quest3DoYourPart();
 				break;
 			case "quest3Deliver":
-				quest3Deliver(Inputs[0]);
+				quest3Deliver(param);
 				break;
 			case "posttestmessages":
 				posttestmessages();
@@ -1161,10 +1159,11 @@ public class App {
 	// TODO
 	private static void testalles3() throws UnirestException {
 		ausgabe = "";
-		quest3PostAssignments();
+		/*quest3PostAssignments();
 		quest3DoYourPart();
-		//quest3Deliver();
+		quest3Deliver("");*/
 	}
+
 	private static void quest3PostAssignments() throws UnirestException {
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("LoginLeeroyJenkins\n");
@@ -1207,6 +1206,7 @@ public class App {
 		postAssignments("3","/wounded","/stretcher/handle/front","","do the front","",App.my_IP);
 		postAssignments("3","/wounded","/stretcher/handle/back","","do the back","","http://172.19.0.81:4567");
 	}
+
 	private static void quest3DoYourPart() throws UnirestException {
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("LoginLeeroyJenkins\n");
@@ -1480,6 +1480,14 @@ public class App {
 		System.out.println(taskResponse.getBody());
 
 		ausgabe += taskResponse.getBody() + "\n";
+
+		System.out.println(taskResponse.getBody().getObject());
+		System.out.println(taskResponse.getBody().getObject().get("object"));
+		System.out.println(taskResponse.getBody().getObject().get("url"));
+
+
+
+		//{"object":{"capabilities":"non","heroclass":"mailbox","user":"/users/jannikb","url":"172.19.0.50:4567","group":1461},"status":"success"}
 	}
 
 	private static void registerUser(String username, String password) throws UnirestException {
