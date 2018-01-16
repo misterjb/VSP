@@ -557,10 +557,10 @@ public class App {
 				notjoinGroup(Inputs[0], Inputs[1]);
 				break;
 			case "joinGroup":
-				joinGroup(Inputs[0]);
+				joinGroup(param);
 				break;
 			case "getGroup":
-				getGroup(Inputs[0]);
+				getGroup(param);
 				break;
 			case "postAssignments":
 				postAssignments(Inputs[0], Inputs[1], Inputs[2], Inputs[3], Inputs[4], Inputs[5], Inputs[6]);
@@ -1204,7 +1204,7 @@ public class App {
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
 		postAssignments("3","/wounded","/stretcher/handle/front","","do the front","",App.my_IP);
-		postAssignments("3","/wounded","/stretcher/handle/back","","do the back","","http://172.19.0.81:4567");
+		postAssignments("3","/wounded","/stretcher/handle/back","","do the back","",grouplist.get(1));
 	}
 
 	private static void quest3DoYourPart() throws UnirestException {
