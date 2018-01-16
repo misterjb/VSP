@@ -241,6 +241,16 @@ public class App {
 			response.body(new Gson().toJson(json));
 			return response.body();
 		});
+		get("/assignments/callback", (request, response) -> {
+			JSONObject json = new JSONObject();
+			for (int i = 0; i < assignmentcallback_List.size(); i++) {
+				json.put("" + i, new Gson().toJson(assignmentcallback_List.get(i)));
+			}
+			hiring_List.clear();
+			response.status(200);
+			response.body(new Gson().toJson(json));
+			return response.body();
+		});
 		post("/messages", (request, response) -> {
 			System.out.println(request.ip());
 			System.out.println(request.port());
@@ -521,6 +531,15 @@ public class App {
 			case "allinOne3":
 				completeQuestThree();
 				break;
+			case "quest3PostAssignments":
+				quest3PostAssignments();
+				break;
+			case "quest3DoYourPart":
+				quest3DoYourPart();
+				break;
+			case "quest3Deliver":
+				quest3Deliver(Inputs[0]);
+				break;
 			case "posttestmessages":
 				posttestmessages();
 				break;
@@ -688,6 +707,28 @@ public class App {
 		ausgabe += "############getAssignments#############\n";
 		ausgabe += jsonObj1 + "\n";
 		ausgabe += "########################################\n";
+	}
+
+	private static void getAssignmentsCallback() throws UnirestException {
+		HttpResponse<JsonNode> jsonResponse1 = Unirest.get(my_IP + "/assignments/callback").asJson();
+		JSONObject jsonObj1 = jsonResponse1.getBody().getObject();
+		assertEquals(200, jsonResponse1.getStatus());
+		System.out.println("############getAssignmentsCallback#############\n");
+		System.out.println(jsonObj1 + "\n");
+		System.out.println("####################################\n");
+		ausgabe += "############getAssignmentsCallback#############\n";
+		ausgabe += jsonObj1 + "\n";
+		ausgabe += "########################################\n";
+
+/*		System.out.println("############get#############\n");
+		System.out.println(jsonObj1.getString("data") + "\n");
+		System.out.println("####################################\n");
+
+		if(!(jsonObj1.getString("data").equals(null))){
+			String[] parts = jsonObj1.getString("data").split("#");
+			tokenMap.put(parts[0],parts[1]);
+		}
+*/
 	}
 
 	private static void showquestions() {
@@ -1120,74 +1161,75 @@ public class App {
 	// TODO
 	private static void testalles3() throws UnirestException {
 		ausgabe = "";
-		testLeeroyJenkins();
-		testJannikb();
-
+		quest3PostAssignments();
+		quest3DoYourPart();
+		//quest3Deliver();
 	}
-
-	private static void signInTaverna(String heroclass, String capabilities, String user, String url) throws UnirestException {
-		JSONObject jo = new JSONObject();
-		jo.put("heroclass", heroclass);
-		jo.put("capabilities", capabilities);
-		jo.put("url", url);
-		jo.put("user", user);
-		System.out.println(jo);
-		HttpResponse<JsonNode> deliverResponse = Unirest
-				.post("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/adventurers")
-				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken)
-				.body(jo).asJson();
-		System.out.println(deliverResponse.getBody());
-		ausgabe += deliverResponse.getBody() + "\n";
-	}
-
-	private static void showBlackboard() throws UnirestException {
-		HttpResponse<JsonNode> taskResponse = Unirest
-				.get("http://" + blackboard_IP + ":" + blackboard_Port)
-				.asJson();
-		System.out.println(taskResponse.getBody());
-
-		ausgabe += taskResponse.getBody() + "\n";
-	}
-
-	private static void showTaverna() throws UnirestException {
-		HttpResponse<JsonNode> taskResponse = Unirest
-				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/adventurers")
-				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken).asJson();
-		System.out.println(taskResponse.getBody());
-
-		ausgabe += taskResponse.getBody() + "\n";
-	}
-
-	private static void showGroup(String id) throws UnirestException {
-		HttpResponse<JsonNode> taskResponse = Unirest
-				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/groups/" + id + "/members")
-				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken).asJson();
-		System.out.println(taskResponse.getBody());
-
-		ausgabe += taskResponse.getBody() + "\n";
-	}
-
-	private static void showAdventurers(String name) throws UnirestException {
-		HttpResponse<JsonNode> taskResponse = Unirest
-				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/adventurers/" + name)
-				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken).asJson();
-		System.out.println(taskResponse.getBody());
-
-		ausgabe += taskResponse.getBody() + "\n";
-	}
-
-	private static void testLeeroyJenkins() throws UnirestException {
+	private static void quest3PostAssignments() throws UnirestException {
 		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("LoginWarrior\n");
+		System.out.println("LoginLeeroyJenkins\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
 
 		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "LoginWarrior\n";
+		ausgabe += "LoginLeeroyJenkins\n";
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
 		login("LeeroyJenkins", "LeeroyJenkins");
 
 		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showGroup\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+		ausgabe += "showGroup\n";
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+
+		showGroup("1461");
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showAdventurerJannkikb\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+		ausgabe += "showAdventurerJannkikb\n";
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+
+		showAdventurers("jannikb");
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("postAssignments\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+		ausgabe += "postAssignments\n";
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+
+		postAssignments("3","/wounded","/stretcher/handle/front","","do the front","",App.my_IP);
+		postAssignments("3","/wounded","/stretcher/handle/back","","do the back","","http://172.19.0.81:4567");
+	}
+	private static void quest3DoYourPart() throws UnirestException {
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("LoginLeeroyJenkins\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+		ausgabe += "LoginLeeroyJenkins\n";
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+
+		login("LeeroyJenkins", "LeeroyJenkins");
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("my_IP\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+		ausgabe += "my_IP\n";
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+
+		System.out.println(my_IP+"\n");
+		ausgabe += my_IP+"\n";
+
+		/*System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("showBlackboard\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
 
@@ -1195,7 +1237,7 @@ public class App {
 		ausgabe += "showBlackboard\n";
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
-		//showBlackboard();
+		showBlackboard();
 
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("showTaverna\n");
@@ -1217,8 +1259,8 @@ public class App {
 
 		//////PORT////////
 		// post new information to the taverna and get group id etc.
-		//signInTaverna("uberraidbossx2","group, election, bully, mutex","/users/LeeroyJenkins","172.19.0.81:4568");
-
+		signInTaverna("uberraidbossx2","group, election, bully, mutex","/users/LeeroyJenkins","172.19.0.81:4568");
+		*/
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("showGroup\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
@@ -1240,6 +1282,16 @@ public class App {
 		showAdventurers("LeeroyJenkins");
 
 		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("showAdventurerJannkikb\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+		ausgabe += "showAdventurerJannkikb\n";
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+
+		showAdventurers("jannikb");
+
+		/*System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("joinGroup\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
 
@@ -1247,9 +1299,9 @@ public class App {
 		ausgabe += "joinGroup\n";
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
-		joinGroup("1461");
+		joinGroup("1461");*/
 
-		System.out.println("-----------------------------------------------------------------------------------\n");
+		/*System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("getAssignments\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
 
@@ -1257,18 +1309,7 @@ public class App {
 		ausgabe += "getAssignments\n";
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
-		//getAssignments();
-
-		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("postAssignments\n");
-		System.out.println("-----------------------------------------------------------------------------------\n");
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "postAssignments\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		postAssignments("3","/wounded","/stretcher/handle/front","","do the front","",App.my_IP);//hier das token? also wieder zurücksenden?
-		postAssignments("3","/wounded","/stretcher/handle/back","","do the back","",App.my_IP);
+		getAssignments();*/
 
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("getAssignments\n");
@@ -1330,111 +1371,37 @@ public class App {
 
 		action("/stretcher/handle/front", "Throneroom", ""); //postAssigment with token
 
-		/*
-		 * JSONObject jo = new JSONObject(); jo.put("id","warrior");
-		 * jo.put("task",ass.getTask()); jo.put("resource",ass.getResource());
-		 * jo.put("method","post on /wounded/stretcher/handle/back");
-		 * jo.put("user",user.getUrl()); jo.put("message","his feet smell");
-		 * HttpResponse<JsonNode> deliverResponse = Unirest .post("http://" +
-		 * ass.getCallback() + ass.getResource()) .header("Content-Type",
-		 * "application/json") .body(jo).asJson();
-		 */
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("getAssignments\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+		ausgabe += "getAssignments\n";
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+
+		getAssignments();
+
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("getAssignmentsCallback\n");
+		System.out.println("-----------------------------------------------------------------------------------\n");
+
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+		ausgabe += "getAssignmentsCallback\n";
+		ausgabe += "-----------------------------------------------------------------------------------\n";
+
+		getAssignmentsCallback();
 	}
 
-
-
-	private static void testJannikb() throws UnirestException {
-		System.out.println("LoginMage\n");
+	private static void quest3Deliver(String tokenValue) throws UnirestException {
+		System.out.println("-----------------------------------------------------------------------------------\n");
+		System.out.println("LoginLeeroyJenkins\n");
 		System.out.println("-----------------------------------------------------------------------------------\n");
 
 		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "LoginMage\n";
+		ausgabe += "LoginLeeroyJenkins\n";
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
-		login("jannikb", "jannikb");
-
-		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("showBlackboard\n");
-		System.out.println("-----------------------------------------------------------------------------------\n");
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "showBlackboard\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		showBlackboard();
-
-		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("signInTaverna\n");
-		System.out.println("-----------------------------------------------------------------------------------\n");
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "signInTaverna\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		//signInTaverna("mailbox","group, election, bully, mutex","/users/jannikb","172.19.0.50:4567");
-
-		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("showGroup\n");
-		System.out.println("-----------------------------------------------------------------------------------\n");
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "showGroup\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		showGroup("1461");
-
-		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("showAdventurerjannikb\n");
-		System.out.println("-----------------------------------------------------------------------------------\n");
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "showAdventurerjannikb\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		showAdventurers("jannikb");
-
-		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("joinGroup\n");
-		System.out.println("-----------------------------------------------------------------------------------\n");
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "joinGroup\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		joinGroup("1461");
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "getAssignments2\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		getAssignments();
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "checkWounded\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("checkWounded\n");
-		System.out.println("-----------------------------------------------------------------------------------\n");
-
-		checkLocation("/wounded", "Throneroom");
-
-		System.out.println("-----------------------------------------------------------------------------------\n");
-		System.out.println("help\n");
-		System.out.println("-----------------------------------------------------------------------------------\n");
-
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-		ausgabe += "help\n";
-		ausgabe += "-----------------------------------------------------------------------------------\n";
-
-		action("/stretcher/handle/back", "Throneroom", "");
-
-
-		//how to get token?
-		getAssignments();
-		//save tokens
-
-
+		login("LeeroyJenkins", "LeeroyJenkins");
 
 		System.out.println("-----------------------------------------------------------------------------------\n");
 		System.out.println("deliverWounded\n");
@@ -1447,7 +1414,7 @@ public class App {
 		JSONObject jo = new JSONObject();
 		JSONArray ja = new JSONArray();
 		ja.put(tokenMap.get("Token:Bloody Handle front"));
-		ja.put(tokenMap.get("Token:Bloody Handle back"));
+		ja.put(tokenValue);
 		jo.put("tokens", ja);
 		System.out.println(jo);
 
@@ -1462,6 +1429,57 @@ public class App {
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
 		deliver("Token:Carry a wounded person", "4", "3");
+	}
+
+	private static void signInTaverna(String heroclass, String capabilities, String user, String url) throws UnirestException {
+		JSONObject jo = new JSONObject();
+		jo.put("heroclass", heroclass);
+		jo.put("capabilities", capabilities);
+		jo.put("url", url);
+		jo.put("user", user);
+		System.out.println(jo);
+		HttpResponse<JsonNode> deliverResponse = Unirest
+				.post("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/adventurers")
+				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken)
+				.body(jo).asJson();
+		System.out.println(deliverResponse.getBody());
+		ausgabe += deliverResponse.getBody() + "\n";
+	}
+
+	private static void showBlackboard() throws UnirestException {
+		HttpResponse<JsonNode> taskResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port)
+				.asJson();
+		System.out.println(taskResponse.getBody());
+
+		ausgabe += taskResponse.getBody() + "\n";
+	}
+
+	private static void showTaverna() throws UnirestException {
+		HttpResponse<JsonNode> taskResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/adventurers")
+				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken).asJson();
+		System.out.println(taskResponse.getBody());
+
+		ausgabe += taskResponse.getBody() + "\n";
+	}
+
+	private static void showGroup(String id) throws UnirestException {
+		HttpResponse<JsonNode> taskResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/groups/" + id + "/members")
+				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken).asJson();
+		System.out.println(taskResponse.getBody());
+
+		ausgabe += taskResponse.getBody() + "\n";
+	}
+
+	private static void showAdventurers(String name) throws UnirestException {
+		HttpResponse<JsonNode> taskResponse = Unirest
+				.get("http://" + blackboard_IP + ":" + blackboard_Port + "/taverna/adventurers/" + name)
+				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken).asJson();
+		System.out.println(taskResponse.getBody());
+
+		ausgabe += taskResponse.getBody() + "\n";
 	}
 
 	private static void registerUser(String username, String password) throws UnirestException {
@@ -1668,7 +1686,7 @@ public class App {
 		HttpResponse<JsonNode> deliverResponse = Unirest
 				.post("http://" + blackboard_IP + ":" + blackboard_Port + "/blackboard/quests/" + questId
 						+ "/deliveries")
-				.header("Content-Type", "application/json").header("Authorization", "Token " + authenticationToken)
+				.header("Accept", "application/json").header("Authorization", "Token " + authenticationToken)
 				.body(jo).asJson();
 		System.out.println(deliverResponse.getBody());
 		ausgabe += deliverResponse.getBody() + "\n";
