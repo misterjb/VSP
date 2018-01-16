@@ -1204,8 +1204,15 @@ public class App {
 		ausgabe += "postAssignments\n";
 		ausgabe += "-----------------------------------------------------------------------------------\n";
 
-		postAssignments("3", "/wounded", "/stretcher/handle/front", "", "do the front", "", App.my_IP);
-		postAssignments("3", "/wounded", "/stretcher/handle/back", "", "do the back", "", grouplist.get(1));
+		String app2ip = "";
+		for (int i = 0; i < grouplist.size(); i++) {
+			if(!my_IP.equals(grouplist.get(i))){
+				app2ip =grouplist.get(i);
+			}
+		}
+		
+		postAssignments("3", "/wounded", "/stretcher/handle/front", "", "do the front", "",my_IP);
+		postAssignments("3", "/wounded", "/stretcher/handle/back", "", "do the back", "", app2ip);
 	}
 
 	private static void quest3DoYourPart() throws UnirestException {
